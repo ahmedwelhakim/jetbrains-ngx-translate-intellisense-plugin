@@ -1,8 +1,7 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.toolWindow
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.configuration.ConfigurationStateService
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.MyProjectService
-import com.intellij.openapi.components.service
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.NgxTranslateToolsetBundle
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.ConfigurationStateService
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
@@ -18,11 +17,7 @@ import javax.swing.JPanel
 
 
 class NgxTranslateToolWindowFactory : ToolWindowFactory {
-
-//    init {
-//        thisLogger().warn("Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.")
-//    }
-
+    
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val myToolWindow = NgxTranslateToolWindow(toolWindow)
         val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(project), null, false)
@@ -33,7 +28,6 @@ class NgxTranslateToolWindowFactory : ToolWindowFactory {
 
     class NgxTranslateToolWindow(toolWindow: ToolWindow) {
 
-        private val service = toolWindow.project.service<MyProjectService>()
 
         fun getContent(project: Project): JPanel {
             val stateService = ConfigurationStateService.getInstance(project)
@@ -58,9 +52,9 @@ class NgxTranslateToolWindowFactory : ToolWindowFactory {
             return JPanel(BorderLayout(10, 5)).apply {
                 add(
                     JPanel(VerticalFlowLayout(4, 4).apply { horizontalFill = true }).apply {
-                        add(JLabel("Language"))
+                        add(JLabel(NgxTranslateToolsetBundle.message("languageLabel")))
                         add(langField)
-                        add(JLabel("Path"))
+                        add(JLabel(NgxTranslateToolsetBundle.message("translationDirectory")))
                         add(pathField)
                         add(saveButton)
                     },

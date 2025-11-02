@@ -5,17 +5,30 @@
     <vendor email="ahmed.w.elhakim@gmail.com">Ahmed Elhakim</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
 
+    <depends>com.intellij.modules.json</depends>
+    <depends>com.intellij.modules.xml</depends>
+    <depends>JavaScript</depends>
+    <depends>AngularJS</depends>
     <resource-bundle>messages.NgxTranslateToolsetBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow
                 factoryClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.toolWindow.NgxTranslateToolWindowFactory"
-                id="MyToolWindow"
+                id="Ngx Translate Toolkit"
                 anchor="right"
-
         />
-        <!--        <postStartupActivity-->
-        <!--                implementation="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.startup.MyProjectActivity"/>-->
+        <psi.referenceContributor language="TypeScript"
+                                  implementation="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.reference.I18nReferenceContributor"/>
+        <psi.referenceContributor language="Angular2"
+                                  implementation="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.reference.I18nReferenceContributor"/>
+
+        <completion.contributor language="Angular2"
+                                implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion.I18nCompletionContributor"/>
+        <completion.contributor language="TypeScript"
+                                implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion.I18nCompletionContributor"/>
+
+
     </extensions>
 </idea-plugin>
