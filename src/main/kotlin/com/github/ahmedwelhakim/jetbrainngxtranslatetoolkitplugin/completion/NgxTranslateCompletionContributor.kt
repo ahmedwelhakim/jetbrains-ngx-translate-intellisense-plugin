@@ -5,12 +5,12 @@ import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.lang.javascript.JSTokenTypes
 import com.intellij.patterns.PlatformPatterns
 
-class I18nCompletionContributor : CompletionContributor() {
+class NgxTranslateCompletionContributor : CompletionContributor() {
     init {
         extend(
             CompletionType.BASIC,
             PlatformPatterns.psiElement(JSTokenTypes.STRING_LITERAL),
-            I18nCompletionProvider()
+            NgxTranslateCompletionProvider()
         )
     }
 }

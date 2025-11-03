@@ -1,6 +1,6 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.psi
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.ConfigurationStateService
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateConfigurationStateService
 import com.intellij.json.JsonFileType
 import com.intellij.json.JsonUtil
 import com.intellij.json.psi.JsonFile
@@ -13,7 +13,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiManager
 import kotlin.io.path.Path
 
-object I18nPsiUtils {
+object NgxTranslatePsiUtils {
     fun getTranslationValueStringLiterals(project: Project, keys: List<String>?): List<JsonStringLiteral> {
         if (keys.isNullOrEmpty()) return listOf()
         val jsonAssets = getTranslationJsonFilesFromProject(project)
@@ -57,7 +57,7 @@ object I18nPsiUtils {
     }
 
     private fun getTranslationJsonFilesFromProject(project: Project): List<VirtualFile> {
-        return ConfigurationStateService
+        return NgxTranslateConfigurationStateService
             .getInstance(project).state.i18nPath
             ?.let { getTranslationJsonFilesFromDirPath(it) }
             ?: listOf()

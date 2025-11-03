@@ -1,7 +1,7 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.toolWindow
+package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.ui
 
 import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.NgxTranslateToolsetBundle
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.ConfigurationStateService
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateConfigurationStateService
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
@@ -30,7 +30,7 @@ class NgxTranslateToolWindowFactory : ToolWindowFactory {
 
 
         fun getContent(project: Project): JPanel {
-            val stateService = ConfigurationStateService.getInstance(project)
+            val stateService = NgxTranslateConfigurationStateService.getInstance(project)
             val state = stateService.state
 
             val langField = JBTextField(state.lang)

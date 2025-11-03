@@ -1,20 +1,20 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.psi.I18nPsiUtils
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.psi.NgxTranslatePsiUtils
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.util.ProcessingContext
 
-class I18nCompletionProvider : CompletionProvider<CompletionParameters>() {
+class NgxTranslateCompletionProvider : CompletionProvider<CompletionParameters>() {
     override fun addCompletions(
         parameters: CompletionParameters,
         context: ProcessingContext,
         result: CompletionResultSet
     ) {
         val project = parameters.editor.project ?: return
-        I18nPsiUtils.getAllTranslationKeys(project).forEach { key ->
+        NgxTranslatePsiUtils.getAllTranslationKeys(project).forEach { key ->
             result.addElement(
                 LookupElementBuilder
                     .create(key)

@@ -6,8 +6,8 @@ import com.intellij.openapi.util.io.FileUtil
 
 @State(name = "ConfigurationStateService", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
 @Service(Service.Level.PROJECT)
-class ConfigurationStateService :
-    SimplePersistentStateComponent<ConfigurationStateService.ConfigurationState>(ConfigurationState()) {
+class NgxTranslateConfigurationStateService :
+    SimplePersistentStateComponent<NgxTranslateConfigurationStateService.ConfigurationState>(ConfigurationState()) {
 
     class ConfigurationState : BaseState() {
         var lang by string("en")
@@ -20,8 +20,8 @@ class ConfigurationStateService :
     }
 
     companion object {
-        fun getInstance(project: Project): ConfigurationStateService =
-            project.getService(ConfigurationStateService::class.java)
+        fun getInstance(project: Project): NgxTranslateConfigurationStateService =
+            project.getService(NgxTranslateConfigurationStateService::class.java)
 
         fun getSystemDependentPath(project: Project): String {
             return toSystemDependent(getInstance(project).state.i18nPath!!)
