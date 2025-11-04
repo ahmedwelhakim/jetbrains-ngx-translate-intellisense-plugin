@@ -1,6 +1,6 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.psi.NgxTranslatePsiUtils
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateKeyCache
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
@@ -14,7 +14,7 @@ class NgxTranslateCompletionProvider : CompletionProvider<CompletionParameters>(
         result: CompletionResultSet
     ) {
         val project = parameters.editor.project ?: return
-        NgxTranslatePsiUtils.getAllTranslationKeys(project).forEach { key ->
+        project.getService(NgxTranslateKeyCache::class.java).getAllKeys().forEach { key ->
             result.addElement(
                 LookupElementBuilder
                     .create(key)

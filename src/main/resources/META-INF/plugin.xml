@@ -29,6 +29,7 @@
         <completion.contributor language="TypeScript"
                                 implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion.NgxTranslateCompletionContributor"/>
 
-
+        <fileBasedIndex
+                implementation="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.indexes.NgxTranslateKeysFileIndex"/>
     </extensions>
 </idea-plugin>

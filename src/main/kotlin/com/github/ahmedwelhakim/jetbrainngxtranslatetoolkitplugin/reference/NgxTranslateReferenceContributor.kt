@@ -9,15 +9,11 @@ import org.angular2.lang.expr.Angular2Language
 class NgxTranslateReferenceContributor : PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
         registrar.registerReferenceProvider(
-            // The PSI pattern — e.g., all JS string literals
             PlatformPatterns.psiElement(JSLiteralExpression::class.java),
-            // The provider that will handle those elements
             NgxTranslateReferenceProvider()
         )
         registrar.registerReferenceProvider(
-            // The PSI pattern — e.g., all JS string literals
             PlatformPatterns.psiElement(JSLiteralExpression::class.java).withLanguage(Angular2Language),
-            // The provider that will handle those elements
             NgxTranslateReferenceProvider()
         )
     }
