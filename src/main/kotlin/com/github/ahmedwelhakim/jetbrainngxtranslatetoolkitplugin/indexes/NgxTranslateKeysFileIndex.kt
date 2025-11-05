@@ -6,6 +6,7 @@ import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectLocator
+import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.indexing.*
 import com.intellij.util.io.EnumeratorStringDescriptor
@@ -19,7 +20,7 @@ class NgxTranslateKeysFileIndex : ScalarIndexExtension<String>() {
         fun findAllKeys(project: Project): Set<String> {
             return FileBasedIndex.getInstance().getAllKeys(TRANSLATION_INDEX_ID, project).toSet()
         }
-        
+
     }
 
     override fun getName(): ID<String, Void> = TRANSLATION_INDEX_ID
@@ -27,8 +28,7 @@ class NgxTranslateKeysFileIndex : ScalarIndexExtension<String>() {
     override fun getInputFilter(): FileBasedIndex.InputFilter {
         return object : FileBasedIndex.InputFilter {
             override fun acceptInput(file: VirtualFile): Boolean {
-                if (file.fileType != JsonFileType.INSTANCE) return false
-
+                if (file.fileType != JsonFileType.INSTANCE || file.fileSystem.protocol != StandardFileSystems.FILE_PROTOCOL) return false
 
                 val path = file.path
                 if (path.contains("/node_modules/") ||
@@ -40,9 +40,8 @@ class NgxTranslateKeysFileIndex : ScalarIndexExtension<String>() {
 
                 val project = ProjectLocator.getInstance().guessProjectForFile(file) ?: return false
                 val config = NgxTranslateConfigurationStateService.getInstance(project)
-                val i18nPath = config.state.i18nPath ?: "i18n"
-                val res = path.contains(i18nPath)
-                return path.contains(i18nPath)
+                val i18nPath = config.state.i18nPaths
+                return i18nPath.any { path.contains(it) }
             }
         }
     }

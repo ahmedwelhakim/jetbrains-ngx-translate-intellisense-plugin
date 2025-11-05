@@ -11,28 +11,35 @@ class NgxTranslateConfigurationStateService :
 
     class ConfigurationState : BaseState() {
         var lang by string("en")
-        var i18nPath by string("")
+        var i18nPaths by list<String>()
+        var inlayHintLength by property(40)
     }
 
-    fun saveState(lang: String, path: String) {
+    fun saveSettings(lang: String, path: MutableList<String>, inlayHintLength: Int) {
         state.lang = toSystemIndependent(lang)
-        state.i18nPath = toSystemIndependent(path)
+        state.i18nPaths = toSystemIndependent(path)
+        state.inlayHintLength = inlayHintLength
     }
 
     companion object {
         fun getInstance(project: Project): NgxTranslateConfigurationStateService =
             project.getService(NgxTranslateConfigurationStateService::class.java)
 
-        fun getSystemDependentPath(project: Project): String {
-            return toSystemDependent(getInstance(project).state.i18nPath!!)
+        fun getSystemDependentPath(project: Project): List<String> {
+            return toSystemDependent(getInstance(project).state.i18nPaths)
         }
 
         private fun toSystemIndependent(path: String): String {
             return path.let { FileUtil.toSystemIndependentName(it) }
         }
-
+        private fun toSystemIndependent(path: MutableList<String>): MutableList<String> {
+            return path.map { toSystemIndependent(it) }.toMutableList()
+        }
         private fun toSystemDependent(path: String): String {
             return path.let { FileUtil.toSystemDependentName(it) }
+        }
+        private fun toSystemDependent(path: MutableList<String>): MutableList<String> {
+            return path.map { toSystemDependent(it) }.toMutableList()
         }
     }
 

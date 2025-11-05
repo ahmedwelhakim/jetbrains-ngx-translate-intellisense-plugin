@@ -1,0 +1,42 @@
+package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.inlay
+
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateKeyCache
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.utils.getTruncatedValue
+import com.intellij.codeInsight.hints.InlayHintsCollector
+import com.intellij.codeInsight.hints.InlayHintsSink
+import com.intellij.codeInsight.hints.presentation.PresentationFactory
+import com.intellij.codeInsight.hints.FactoryInlayHintsCollector
+import com.intellij.openapi.editor.Editor
+import com.intellij.psi.PsiElement
+import com.intellij.json.psi.JsonStringLiteral
+import com.intellij.lang.javascript.psi.JSLiteralExpression
+
+@Suppress("UnstableApiUsage")
+class NgxTranslateInlayHintsCollector(
+    editor: Editor
+) : FactoryInlayHintsCollector(editor) {
+
+    override fun collect(element: PsiElement, editor: Editor, sink: InlayHintsSink): Boolean {
+        // Only process string literals
+        val literal = element as? JSLiteralExpression ?: return true
+        val key = literal.stringValue ?: return true
+
+        val project = element.project
+        val cache = project.getService(NgxTranslateKeyCache::class.java)
+        if (!cache.hasKey(key)) return true
+
+        // Fetch the translation value from cache or JSON (we’ll add that next)
+        val value = getTruncatedValue(cache.getValueForKey(key)) ?: return true
+
+        // Add inlay hint after the literal
+        val presentation = factory.smallText(value)
+        val centered = factory.roundWithBackground(factory.inset(presentation, top = 1, down = 2))
+        sink.addInlineElement(
+            literal.textRange.endOffset,
+            relatesToPrecedingText = true,
+            centered,
+            false
+        )
+        return true
+    }
+}

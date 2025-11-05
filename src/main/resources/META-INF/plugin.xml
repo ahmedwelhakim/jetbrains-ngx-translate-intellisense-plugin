@@ -31,5 +31,18 @@
 
         <fileBasedIndex
                 implementation="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.indexes.NgxTranslateKeysFileIndex"/>
+
+        <codeInsight.inlayProvider
+                language="TypeScript"
+                implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.inlay.NgxTranslateInlayHintsProvider"/>
+        <codeInsight.inlayProvider
+                language="Angular2Html"
+                implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.inlay.NgxTranslateInlayHintsProvider"/>
+
+        <projectConfigurable
+                instance="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.settings.NgxTranslateSettingsConfigurable"
+                displayName="Ngx Translate Toolkit"
+                id="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.settings"
+        />
     </extensions>
 </idea-plugin>

@@ -35,17 +35,17 @@ class NgxTranslateToolWindowFactory : ToolWindowFactory {
 
             val langField = JBTextField(state.lang)
             val pathField = TextFieldWithBrowseButton().apply {
-                text = state.i18nPath ?: ""
+
                 addBrowseFolderListener(
 
                     project,
-                    FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                    FileChooserDescriptorFactory.createMultipleFoldersDescriptor()
                 )
             }
 
             val saveButton = JButton("Save").apply {
                 addActionListener {
-                    stateService.saveState(langField.text, pathField.text)
+                    stateService.saveSettings(langField.text, mutableListOf(pathField.text), 40)
                 }
             }
 

@@ -58,8 +58,9 @@ object NgxTranslatePsiUtils {
 
     private fun getTranslationJsonFilesFromProject(project: Project): List<VirtualFile> {
         return NgxTranslateConfigurationStateService
-            .getInstance(project).state.i18nPath
-            ?.let { getTranslationJsonFilesFromDirPath(it) }
+            .getInstance(project).state.i18nPaths
+            ?.map { getTranslationJsonFilesFromDirPath(it) }
+            ?.flatten()
             ?: listOf()
     }
 
