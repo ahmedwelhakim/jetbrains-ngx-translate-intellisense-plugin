@@ -36,6 +36,18 @@ object NgxTranslatePsiUtils {
         }
     }
 
+    fun getAllTranslationKeyValue(project: Project): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        val jsonAssets = getTranslationJsonFilesFromProject(project)
+        val psiManager = PsiManager.getInstance(project)
+        val config = NgxTranslateConfigurationStateService.getInstance(project).state
+        jsonAssets.filter { if (config.lang != null) it.name.contains(config.lang.toString()) else true }.forEach {
+            val psiFile = psiManager.findFile(it) as? JsonFile ?: return@forEach
+            extractJsonKeyValue(psiFile, map)
+        }
+        return map
+    }
+
     fun getAllTranslationKeys(project: Project): List<String> {
         val jsonAssets = getTranslationJsonFilesFromProject(project)
         val psiManager = PsiManager.getInstance(project)
@@ -43,6 +55,13 @@ object NgxTranslatePsiUtils {
             val psiFile = psiManager.findFile(it) as? JsonFile ?: return@flatMap emptyList()
             extractJsonKeys(psiFile)
         }
+    }
+
+    fun getTranslationJsonFilesFromProject(project: Project): List<VirtualFile> {
+        return NgxTranslateConfigurationStateService
+            .getInstance(project).state.i18nPaths
+            .map { getTranslationJsonFilesFromDirPath(it) }
+            .flatten()
     }
 
     private fun getTranslationJsonFilesFromDirPath(path: String): List<VirtualFile> {
@@ -56,13 +75,6 @@ object NgxTranslatePsiUtils {
             ?: listOf()
     }
 
-    private fun getTranslationJsonFilesFromProject(project: Project): List<VirtualFile> {
-        return NgxTranslateConfigurationStateService
-            .getInstance(project).state.i18nPaths
-            ?.map { getTranslationJsonFilesFromDirPath(it) }
-            ?.flatten()
-            ?: listOf()
-    }
 
     private fun extractJsonKeys(jsonFile: JsonFile): List<String> {
         val result = mutableListOf<String>()
@@ -80,5 +92,21 @@ object NgxTranslatePsiUtils {
 
         traverse("", root)
         return result
+    }
+
+    private fun extractJsonKeyValue(jsonFile: JsonFile, map: MutableMap<String, String>) {
+
+        val root = jsonFile.topLevelValue as? JsonObject ?: return
+
+        fun traverse(prefix: String, obj: JsonObject) {
+            obj.propertyList.forEach { prop ->
+                val key = if (prefix.isEmpty()) prop.name else "$prefix.${prop.name}"
+                when (val value = prop.value) {
+                    is JsonObject -> traverse(key, value)
+                    else -> map[key] = value?.text?.trim('"') ?: ""
+                }
+            }
+        }
+        traverse("", root)
     }
 }

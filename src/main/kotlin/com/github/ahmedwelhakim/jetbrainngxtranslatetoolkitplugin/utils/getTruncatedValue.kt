@@ -1,6 +1,12 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.utils
 
-const val TRANSLATION_TEXT_LENGTH = 40
-fun getTruncatedValue(text: String?): String? {
-    return text?.take(TRANSLATION_TEXT_LENGTH)?.let { if(text.length > TRANSLATION_TEXT_LENGTH) "$it..." else it }
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateConfigurationStateService
+import com.intellij.openapi.project.Project
+
+
+fun getTruncatedValue(text: String?, project: Project): String? {
+    val config = project.getService(NgxTranslateConfigurationStateService::class.java)
+    val length = config.state.inlayHintLength
+    return text?.take(length)
+        ?.let { if (text.length > length) "$it..." else it }
 }

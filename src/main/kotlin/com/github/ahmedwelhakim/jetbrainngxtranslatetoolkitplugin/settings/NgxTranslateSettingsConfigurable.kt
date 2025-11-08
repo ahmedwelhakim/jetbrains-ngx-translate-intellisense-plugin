@@ -7,11 +7,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.JBList
+import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.FormBuilder
 import javax.swing.*
-import javax.swing.SpinnerNumberModel
 
 class NgxTranslateSettingsConfigurable(private val project: Project) : Configurable {
     private val service = NgxTranslateConfigurationStateService.getInstance(project)
@@ -47,8 +46,6 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                 }
             }
             .setRemoveAction { pathsList.selectedValuesList.forEach { pathsModel.removeElement(it) } }
-            .setMoveUpAction { moveItem(-1) }
-            .setMoveDownAction { moveItem(1) }
 
         val listPanel = decorator.createPanel()
 
@@ -62,16 +59,6 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
             .panel
     }
 
-    private fun moveItem(direction: Int) {
-        val index = pathsList.selectedIndex
-        if (index < 0) return
-        val newIndex = index + direction
-        if (newIndex in 0 until pathsModel.size) {
-            val element = pathsModel.remove(index)
-            pathsModel.add(newIndex, element)
-            pathsList.selectedIndex = newIndex
-        }
-    }
 
     override fun createComponent(): JComponent = panel
 

@@ -1,15 +1,12 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.inlay
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateKeyCache
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateTranslationCache
 import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.utils.getTruncatedValue
-import com.intellij.codeInsight.hints.InlayHintsCollector
-import com.intellij.codeInsight.hints.InlayHintsSink
-import com.intellij.codeInsight.hints.presentation.PresentationFactory
 import com.intellij.codeInsight.hints.FactoryInlayHintsCollector
+import com.intellij.codeInsight.hints.InlayHintsSink
+import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
-import com.intellij.json.psi.JsonStringLiteral
-import com.intellij.lang.javascript.psi.JSLiteralExpression
 
 @Suppress("UnstableApiUsage")
 class NgxTranslateInlayHintsCollector(
@@ -22,11 +19,11 @@ class NgxTranslateInlayHintsCollector(
         val key = literal.stringValue ?: return true
 
         val project = element.project
-        val cache = project.getService(NgxTranslateKeyCache::class.java)
+        val cache = project.getService(NgxTranslateTranslationCache::class.java)
         if (!cache.hasKey(key)) return true
 
         // Fetch the translation value from cache or JSON (we’ll add that next)
-        val value = getTruncatedValue(cache.getValueForKey(key)) ?: return true
+        val value = getTruncatedValue(cache.getValueForKey(key), project) ?: return true
 
         // Add inlay hint after the literal
         val presentation = factory.smallText(value)
