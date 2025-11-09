@@ -1,12 +1,9 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.inlay
 
-
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.NgxTranslateToolsetBundle
 import com.intellij.codeInsight.hints.*
-import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.PsiFile
 import javax.swing.JComponent
 import javax.swing.JPanel
 
@@ -15,13 +12,13 @@ class NgxTranslateInlayHintsProvider :
     InlayHintsProvider<NoSettings> {
 
     override val key = SettingsKey<NoSettings>("ngx.translate.inlay.hints")
-    override val name: String = "Ngx Translate Inline Values"
-    override val previewText: String = "\"HELLO.WORLD\": \"Hello world\""
+    override val name: String = NgxTranslateToolsetBundle.message("inlayHintsProviderName")
+    override val previewText: String = NgxTranslateToolsetBundle.message("inlayHintsPreviewText")
 
     override fun createSettings(): NoSettings = NoSettings()
 
     override fun getCollectorFor(
-        file: com.intellij.psi.PsiFile,
+        file: PsiFile,
         editor: Editor,
         settings: NoSettings,
         sink: InlayHintsSink
@@ -31,8 +28,9 @@ class NgxTranslateInlayHintsProvider :
 
     override fun createConfigurable(settings: NoSettings): ImmediateConfigurable {
         return object : ImmediateConfigurable {
-            override fun createComponent(listener:ChangeListener): JComponent = JPanel()
+            override fun createComponent(listener: ChangeListener): JComponent = JPanel()
         }
     }
+
     override val isVisibleInSettings: Boolean = true
 }

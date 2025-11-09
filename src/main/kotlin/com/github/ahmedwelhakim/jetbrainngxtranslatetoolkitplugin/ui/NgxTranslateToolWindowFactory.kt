@@ -17,7 +17,7 @@ import javax.swing.JPanel
 
 
 class NgxTranslateToolWindowFactory : ToolWindowFactory {
-    
+
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val myToolWindow = NgxTranslateToolWindow(toolWindow)
         val content = ContentFactory.getInstance().createContent(myToolWindow.getContent(project), null, false)
@@ -43,10 +43,10 @@ class NgxTranslateToolWindowFactory : ToolWindowFactory {
                 )
             }
 
-            val saveButton = JButton("Save").apply {
-                addActionListener {
-                    stateService.saveSettings(langField.text, mutableListOf(pathField.text), 40)
-                }
+            val saveButton = JButton(NgxTranslateToolsetBundle.message("saveButton")).apply {
+//                addActionListener {
+//                    stateService.saveSettings(langField.text, mutableListOf(pathField.text), 40)
+//                }
             }
 
             return JPanel(BorderLayout(10, 5)).apply {

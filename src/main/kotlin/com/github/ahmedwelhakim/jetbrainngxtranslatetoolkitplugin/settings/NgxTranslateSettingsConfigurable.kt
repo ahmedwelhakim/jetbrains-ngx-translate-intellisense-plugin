@@ -1,5 +1,6 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.settings
 
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.NgxTranslateToolsetBundle
 import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateConfigurationStateService
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
@@ -17,7 +18,8 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
 
     private val langField = JBTextField()
     private val inlayLengthSpinner = JSpinner(SpinnerNumberModel(40, 10, 200, 5))
-
+    private val autoDiscoveryCheckbox = JCheckBox(NgxTranslateToolsetBundle.message("enableAutoDiscovery"))
+    private val inlayHintsCheckbox = JCheckBox(NgxTranslateToolsetBundle.message("enableInlayHints"))
     private val pathsModel = DefaultListModel<String>()
     private val pathsList = JBList(pathsModel)
 
@@ -28,14 +30,13 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
             .setAddAction {
                 val chooser = TextFieldWithBrowseButton()
                 chooser.addBrowseFolderListener(
-
                     project,
                     FileChooserDescriptorFactory.createSingleFolderDescriptor()
                 )
                 val dialog = JOptionPane.showConfirmDialog(
                     null,
                     chooser,
-                    "Add i18n Folder",
+                    NgxTranslateToolsetBundle.message("addI18nFolder"),
                     JOptionPane.OK_CANCEL_OPTION
                 )
                 if (dialog == JOptionPane.OK_OPTION) {
@@ -50,15 +51,16 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         val listPanel = decorator.createPanel()
 
         panel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(JBLabel("Default Language:"), langField, 1, false)
-            .addLabeledComponent(JBLabel("Inlay Hint Length:"), inlayLengthSpinner, 1, false)
+            .addLabeledComponent(JBLabel(NgxTranslateToolsetBundle.message("defaultLanguageLabel")), langField, 1, false)
+            .addLabeledComponent(JBLabel(NgxTranslateToolsetBundle.message("enableInlayHintsLabel")), inlayHintsCheckbox, 1, false)
+            .addLabeledComponent(JBLabel(NgxTranslateToolsetBundle.message("inlayHintLength")), inlayLengthSpinner, 1, false)
+            .addLabeledComponent(JBLabel(NgxTranslateToolsetBundle.message("enableAutoDiscovery")), autoDiscoveryCheckbox, 1, false)
             .addSeparator()
-            .addComponent(JBLabel("Translation Folders (i18n Paths):"))
+            .addComponent(JBLabel(NgxTranslateToolsetBundle.message("translationFoldersLabel")))
             .addComponent(listPanel)
             .addComponentFillVertically(JPanel(), 0)
             .panel
     }
-
 
     override fun createComponent(): JComponent = panel
 
@@ -66,6 +68,8 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         val state = service.state
         return langField.text != state.lang ||
                 (inlayLengthSpinner.value as Int) != state.inlayHintLength ||
+                autoDiscoveryCheckbox.isSelected != state.autoDiscoveryEnabled ||
+                inlayHintsCheckbox.isSelected != state.inlayHintEnabled ||
                 pathsModel.elements().toList() != state.i18nPaths
     }
 
@@ -73,7 +77,9 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         service.saveSettings(
             langField.text,
             pathsModel.elements().toList().toMutableList(),
-            inlayLengthSpinner.value as Int
+            inlayLengthSpinner.value as Int,
+            inlayHintsCheckbox.isSelected,
+            autoDiscoveryCheckbox.isSelected
         )
     }
 
@@ -81,10 +87,11 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         val state = service.state
         langField.text = state.lang
         inlayLengthSpinner.value = state.inlayHintLength
+        autoDiscoveryCheckbox.isSelected = state.autoDiscoveryEnabled
+        inlayHintsCheckbox.isSelected = state.inlayHintEnabled
         pathsModel.clear()
         state.i18nPaths.forEach { pathsModel.addElement(it) }
     }
 
-    override fun getDisplayName(): String = "Ngx Translate Toolkit"
-
+    override fun getDisplayName(): String = NgxTranslateToolsetBundle.message("ngxTranslateToolkit")
 }
