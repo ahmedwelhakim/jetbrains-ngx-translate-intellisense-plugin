@@ -12,10 +12,6 @@ class NgxTranslateTranslationCache(private val project: Project) {
 
     private val cachedValuesManager = CachedValuesManager.getManager(project)
 
-    /**
-     * Cached snapshot of all translation keys (and optionally values).
-     * Recomputed only when the translation index changes.
-     */
     private val cachedSnapshot = cachedValuesManager.createCachedValue {
         val keys = NgxTranslatePsiUtils.getAllTranslationKeys(project).toSet()
         val values = NgxTranslatePsiUtils.getAllTranslationKeyValue(project)

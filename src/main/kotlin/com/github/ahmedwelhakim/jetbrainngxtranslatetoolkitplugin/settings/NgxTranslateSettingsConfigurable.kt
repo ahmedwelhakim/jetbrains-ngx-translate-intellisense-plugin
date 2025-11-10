@@ -28,11 +28,16 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
     init {
         val decorator = ToolbarDecorator.createDecorator(pathsList)
             .setAddAction {
-                val chooser = TextFieldWithBrowseButton()
-                chooser.addBrowseFolderListener(
-                    project,
-                    FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                )
+                val chooser = TextFieldWithBrowseButton().apply {
+                    addBrowseFolderListener(
+                        project,
+                        FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                            .withTitle(NgxTranslateToolsetBundle.message("addI18nFolder"))
+                            .withDescription(NgxTranslateToolsetBundle.message("addI18nFolderDescription"))
+
+                    )
+
+                }
                 val dialog = JOptionPane.showConfirmDialog(
                     null,
                     chooser,
@@ -51,10 +56,30 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         val listPanel = decorator.createPanel()
 
         panel = FormBuilder.createFormBuilder()
-            .addLabeledComponent(JBLabel(NgxTranslateToolsetBundle.message("defaultLanguageLabel")), langField, 1, false)
-            .addLabeledComponent(JBLabel(NgxTranslateToolsetBundle.message("enableInlayHintsLabel")), inlayHintsCheckbox, 1, false)
-            .addLabeledComponent(JBLabel(NgxTranslateToolsetBundle.message("inlayHintLength")), inlayLengthSpinner, 1, false)
-            .addLabeledComponent(JBLabel(NgxTranslateToolsetBundle.message("enableAutoDiscovery")), autoDiscoveryCheckbox, 1, false)
+            .addLabeledComponent(
+                JBLabel(NgxTranslateToolsetBundle.message("defaultLanguageLabel")),
+                langField,
+                1,
+                false
+            )
+            .addLabeledComponent(
+                JBLabel(NgxTranslateToolsetBundle.message("enableInlayHintsLabel")),
+                inlayHintsCheckbox,
+                1,
+                false
+            )
+            .addLabeledComponent(
+                JBLabel(NgxTranslateToolsetBundle.message("inlayHintLength")),
+                inlayLengthSpinner,
+                1,
+                false
+            )
+            .addLabeledComponent(
+                JBLabel(NgxTranslateToolsetBundle.message("enableAutoDiscovery")),
+                autoDiscoveryCheckbox,
+                1,
+                false
+            )
             .addSeparator()
             .addComponent(JBLabel(NgxTranslateToolsetBundle.message("translationFoldersLabel")))
             .addComponent(listPanel)

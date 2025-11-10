@@ -96,7 +96,10 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
     }
 
     private fun setI18nPaths(paths: List<String>) {
-        state.i18nPaths = (state.i18nPaths + paths).distinct().toMutableList()
+        state.i18nPaths = (state.i18nPaths + paths).distinct().filter {
+            val dir = VirtualFileManager.getInstance().findFileByUrl("file://$it")
+            dir?.children?.isNotEmpty() == true
+        }.toMutableList()
     }
 
     companion object {

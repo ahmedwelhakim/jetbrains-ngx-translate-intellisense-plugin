@@ -68,8 +68,17 @@ class NgxTranslateToolWindow() {
             }
         }
 
+        val refreshButton = JButton("Refresh", AllIcons.General.Refresh).apply {
+            addActionListener {
+                ApplicationManager.getApplication().invokeLater {
+                    refreshTree()
+                }
+            }
+        }
+
         val bottomPanel = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
             add(settingsButton)
+            add(refreshButton)
         }
 
         return JPanel(BorderLayout(10, 5)).apply {
