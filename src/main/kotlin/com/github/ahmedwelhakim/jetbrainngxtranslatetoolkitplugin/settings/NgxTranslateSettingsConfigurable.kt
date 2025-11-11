@@ -1,6 +1,7 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.settings
 
 import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.NgxTranslateToolsetBundle
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common.NgxTranslateUtils
 import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateConfigurationStateService
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
@@ -45,9 +46,33 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                     JOptionPane.OK_CANCEL_OPTION
                 )
                 if (dialog == JOptionPane.OK_OPTION) {
-                    val path = chooser.text
-                    if (path.isNotBlank() && !pathsModel.contains(path)) {
+                    val path = NgxTranslateUtils.toSystemIndependent(chooser.text)
+                    if (path.isNotBlank()
+                        && !pathsModel.contains(path)
+                        && NgxTranslateUtils.isTranslationDirectoryNotEmpty(path)
+                    ) {
                         pathsModel.addElement(path)
+                    } else if (path.isBlank()) {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            NgxTranslateToolsetBundle.message("addI18nFolderPleaseChooseFolderError"),
+                            NgxTranslateToolsetBundle.message("addI18nFolder"),
+                            JOptionPane.ERROR_MESSAGE
+                        )
+                    } else if (!NgxTranslateUtils.isTranslationDirectoryNotEmpty(path)) {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            NgxTranslateToolsetBundle.message("addI18nFolderError"),
+                            NgxTranslateToolsetBundle.message("addI18nFolder"),
+                            JOptionPane.ERROR_MESSAGE
+                        )
+                    } else if (pathsModel.contains(path)) {
+                        JOptionPane.showMessageDialog(
+                            null,
+                            NgxTranslateToolsetBundle.message("addI18nFolderDuplicateError"),
+                            NgxTranslateToolsetBundle.message("addI18nFolder"),
+                            JOptionPane.ERROR_MESSAGE
+                        )
                     }
                 }
             }

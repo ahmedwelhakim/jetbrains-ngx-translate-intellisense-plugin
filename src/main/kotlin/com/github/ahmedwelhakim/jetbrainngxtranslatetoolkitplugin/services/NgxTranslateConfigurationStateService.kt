@@ -1,11 +1,11 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services
 
 import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common.NgxTranslateConstants
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common.NgxTranslateUtils
 import com.intellij.openapi.components.*
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
@@ -25,14 +25,7 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
     }
 
     init {
-        val project = this.project
-        if (state.autoDiscoveryEnabled) {
-            val discovered = autoDiscoverPaths(project)
-            if (discovered.isNotEmpty()) {
-                setI18nPaths(discovered)
-            }
-        }
-
+        autoDiscoverPaths()
         project.messageBus.connect().subscribe(
             VirtualFileManager.VFS_CHANGES,
             object : BulkFileListener {
@@ -40,10 +33,8 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
                     if (!state.autoDiscoveryEnabled) return
 
                     if (events.any { it.file?.extension == "json" }) {
-                        val refreshed = autoDiscoverPaths(project)
-                        if (refreshed.isNotEmpty()) {
-                            setI18nPaths(refreshed)
-                        }
+                        autoDiscoverPaths()
+
                     }
                 }
             }
@@ -57,14 +48,15 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         inlayHintEnabled: Boolean,
         autoDiscoveryEnabled: Boolean
     ) {
-        state.lang = toSystemIndependent(lang)
-        state.i18nPaths = toSystemIndependent(paths)
+        state.lang = NgxTranslateUtils.toSystemIndependent(lang)
+        state.i18nPaths = NgxTranslateUtils.toSystemIndependent(paths)
         state.inlayHintLength = inlayHintLength
         state.inlayHintEnabled = inlayHintEnabled
         state.autoDiscoveryEnabled = autoDiscoveryEnabled
     }
 
-    fun autoDiscoverPaths(project: Project): List<String> {
+    fun autoDiscoverPaths() {
+        if (!state.autoDiscoveryEnabled) return
         val result = mutableSetOf<String>()
 
 
@@ -77,7 +69,7 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
             val children = dir.children ?: return
 
             val localeJsonCount =
-                children.count { it.extension == "json" && NgxTranslateConstants.LOCALE_PATTERN.matches(it.name) }
+                children.count(NgxTranslateUtils::isTranslationFile)
 
             if (localeJsonCount >= 1) {
                 result += dir.path
@@ -91,23 +83,21 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
             val roots = ModuleRootManager.getInstance(module).contentRoots
             for (root in roots) scan(root)
         }
-
-        return result.toList()
+        if (result.isNotEmpty())
+            setI18nPaths(result.toList())
     }
 
     private fun setI18nPaths(paths: List<String>) {
-        state.i18nPaths = (state.i18nPaths + paths).distinct().filter {
-            val dir = VirtualFileManager.getInstance().findFileByUrl("file://$it")
-            dir?.children?.isNotEmpty() == true
-        }.toMutableList()
+        state.i18nPaths = (state.i18nPaths + paths)
+            .distinct()
+            .filter(NgxTranslateUtils::isTranslationDirectoryNotEmpty)
+            .toMutableList()
     }
 
     companion object {
         fun getInstance(project: Project): NgxTranslateConfigurationStateService =
             project.getService(NgxTranslateConfigurationStateService::class.java)
 
-        private fun toSystemIndependent(path: String): String = FileUtil.toSystemIndependentName(path)
-        private fun toSystemIndependent(list: MutableList<String>): MutableList<String> =
-            list.map { toSystemIndependent(it) }.toMutableList()
+
     }
 }

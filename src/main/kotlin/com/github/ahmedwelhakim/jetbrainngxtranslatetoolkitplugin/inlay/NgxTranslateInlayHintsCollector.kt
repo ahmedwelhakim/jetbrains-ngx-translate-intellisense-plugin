@@ -1,6 +1,6 @@
 package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.inlay
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common.getTruncatedValue
+import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common.NgxTranslateUtils
 import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateConfigurationStateService
 import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateTranslationCache
 import com.intellij.codeInsight.hints.FactoryInlayHintsCollector
@@ -26,7 +26,7 @@ class NgxTranslateInlayHintsCollector(
         if (!cache.hasKey(key)) return true
 
         // Fetch the translation value from cache or JSON (we’ll add that next)
-        val value = getTruncatedValue(cache.getValueForKey(key), project) ?: return true
+        val value = NgxTranslateUtils.getTruncatedValue(cache.getValueForKey(key), project) ?: return true
 
         // Add inlay hint after the literal
         val presentation = factory.smallText(value)
