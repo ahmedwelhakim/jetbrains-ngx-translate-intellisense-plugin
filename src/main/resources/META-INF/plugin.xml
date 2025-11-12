@@ -18,6 +18,7 @@
                 factoryClass="com.github.ahmedwelhakim.ngxtranslateintellisense.ui.NgxTranslateToolWindowFactory"
                 id="Ngx Translate Intellisense"
                 anchor="right"
+                icon="/icons/toolwindowIcon.svg"
         />
         <psi.referenceContributor language="TypeScript"
                                   implementation="com.github.ahmedwelhakim.ngxtranslateintellisense.reference.NgxTranslateReferenceContributor"/>
