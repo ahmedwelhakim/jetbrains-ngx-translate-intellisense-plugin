@@ -1,4 +1,4 @@
-# jetbrain-ngx-translate-toolkit-plugin
+# ngx-translate-intellisense
 
 ![Build](https://github.com/ahmedwelhakim/jetbrain-ngx-translate-toolkit-plugin/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
@@ -29,7 +29,7 @@ To keep everything working, do not remove `<!-- ... -->` sections.
 
 - Using the IDE built-in plugin system:
   
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "jetbrain-ngx-translate-toolkit-plugin"</kbd> >
+  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "ngx-translate-intellisense"</kbd> >
   <kbd>Install</kbd>
   
 - Using JetBrains Marketplace:

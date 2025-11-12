@@ -1,4 +1,4 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.reference
+package com.github.ahmedwelhakim.ngxtranslateintellisense.reference
 
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.patterns.PlatformPatterns

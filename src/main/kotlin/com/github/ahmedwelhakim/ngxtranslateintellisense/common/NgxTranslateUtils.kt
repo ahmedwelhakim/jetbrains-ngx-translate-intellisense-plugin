@@ -1,6 +1,6 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common
+package com.github.ahmedwelhakim.ngxtranslateintellisense.common
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateConfigurationStateService
+import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateConfigurationStateService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile

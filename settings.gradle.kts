@@ -2,4 +2,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-rootProject.name = "jetbrain-ngx-translate-toolkit-plugin"
+rootProject.name = "ngx-translate-intellisense"

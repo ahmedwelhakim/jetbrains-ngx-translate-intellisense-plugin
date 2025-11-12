@@ -1,6 +1,6 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services
+package com.github.ahmedwelhakim.ngxtranslateintellisense.services
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.psi.NgxTranslatePsiUtils
+import com.github.ahmedwelhakim.ngxtranslateintellisense.psi.NgxTranslatePsiUtils
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.psi.util.CachedValueProvider

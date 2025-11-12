@@ -1,6 +1,6 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion
+package com.github.ahmedwelhakim.ngxtranslateintellisense.completion
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateTranslationCache
+import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateTranslationCache
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet

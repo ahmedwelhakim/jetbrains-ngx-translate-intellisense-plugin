@@ -1,4 +1,4 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion
+package com.github.ahmedwelhakim.ngxtranslateintellisense.completion
 
 import com.intellij.codeInsight.completion.CompletionContributor
 import com.intellij.codeInsight.completion.CompletionType

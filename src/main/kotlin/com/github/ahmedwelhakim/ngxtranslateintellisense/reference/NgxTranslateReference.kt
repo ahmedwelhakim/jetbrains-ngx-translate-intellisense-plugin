@@ -1,6 +1,6 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.reference
+package com.github.ahmedwelhakim.ngxtranslateintellisense.reference
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.psi.NgxTranslatePsiUtils
+import com.github.ahmedwelhakim.ngxtranslateintellisense.psi.NgxTranslatePsiUtils
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiReferenceBase

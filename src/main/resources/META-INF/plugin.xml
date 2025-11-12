@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin</id>
-    <name>Ngx Translate Toolkit</name>
+    <id>com.github.ahmedwelhakim.ngxtranslateintellisense</id>
+    <name>Ngx Translate Intellisense</name>
     <vendor email="ahmed.w.elhakim@gmail.com">Ahmed Elhakim</vendor>
 
     <depends>com.intellij.modules.platform</depends>
@@ -11,35 +11,35 @@
     <depends>com.intellij.modules.xml</depends>
     <depends>JavaScript</depends>
     <depends>AngularJS</depends>
-    <resource-bundle>messages.NgxTranslateToolsetBundle</resource-bundle>
+    <resource-bundle>messages.NgxTranslateIntellisenseBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow
-                factoryClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.ui.NgxTranslateToolWindowFactory"
-                id="Ngx Translate Toolkit"
+                factoryClass="com.github.ahmedwelhakim.ngxtranslateintellisense.ui.NgxTranslateToolWindowFactory"
+                id="Ngx Translate Intellisense"
                 anchor="right"
         />
         <psi.referenceContributor language="TypeScript"
-                                  implementation="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.reference.NgxTranslateReferenceContributor"/>
+                                  implementation="com.github.ahmedwelhakim.ngxtranslateintellisense.reference.NgxTranslateReferenceContributor"/>
         <psi.referenceContributor language="Angular2"
-                                  implementation="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.reference.NgxTranslateReferenceContributor"/>
+                                  implementation="com.github.ahmedwelhakim.ngxtranslateintellisense.reference.NgxTranslateReferenceContributor"/>
 
         <completion.contributor language="Angular2"
-                                implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion.NgxTranslateCompletionContributor"/>
+                                implementationClass="com.github.ahmedwelhakim.ngxtranslateintellisense.completion.NgxTranslateCompletionContributor"/>
         <completion.contributor language="TypeScript"
-                                implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.completion.NgxTranslateCompletionContributor"/>
+                                implementationClass="com.github.ahmedwelhakim.ngxtranslateintellisense.completion.NgxTranslateCompletionContributor"/>
 
         <codeInsight.inlayProvider
                 language="TypeScript"
-                implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.inlay.NgxTranslateInlayHintsProvider"/>
+                implementationClass="com.github.ahmedwelhakim.ngxtranslateintellisense.inlay.NgxTranslateInlayHintsProvider"/>
         <codeInsight.inlayProvider
                 language="Angular2Html"
-                implementationClass="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.inlay.NgxTranslateInlayHintsProvider"/>
+                implementationClass="com.github.ahmedwelhakim.ngxtranslateintellisense.inlay.NgxTranslateInlayHintsProvider"/>
 
         <projectConfigurable
-                instance="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.settings.NgxTranslateSettingsConfigurable"
-                displayName="Ngx Translate Toolkit"
-                id="com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.settings"
+                instance="com.github.ahmedwelhakim.ngxtranslateintellisense.settings.NgxTranslateSettingsConfigurable"
+                displayName="Ngx Translate Intellisense"
+                id="com.github.ahmedwelhakim.ngxtranslateintellisense.settings"
         />
     </extensions>
 </idea-plugin>

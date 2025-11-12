@@ -1,7 +1,7 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services
+package com.github.ahmedwelhakim.ngxtranslateintellisense.services
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common.NgxTranslateConstants
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common.NgxTranslateUtils
+import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateConstants
+import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateUtils
 import com.intellij.openapi.components.*
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project

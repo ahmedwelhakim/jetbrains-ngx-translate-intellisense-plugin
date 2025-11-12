@@ -1,4 +1,4 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.common
+package com.github.ahmedwelhakim.ngxtranslateintellisense.common
 
 object NgxTranslateConstants {
     val EXCLUDED_DIRS_IN_PATH = setOf(

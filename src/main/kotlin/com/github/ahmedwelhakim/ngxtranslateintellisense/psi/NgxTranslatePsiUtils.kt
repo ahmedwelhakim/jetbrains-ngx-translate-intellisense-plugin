@@ -1,6 +1,6 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.psi
+package com.github.ahmedwelhakim.ngxtranslateintellisense.psi
 
-import com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin.services.NgxTranslateConfigurationStateService
+import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateConfigurationStateService
 import com.intellij.json.JsonFileType
 import com.intellij.json.JsonUtil
 import com.intellij.json.psi.JsonFile

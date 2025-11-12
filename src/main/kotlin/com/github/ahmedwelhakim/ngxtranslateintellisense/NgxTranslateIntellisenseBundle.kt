@@ -1,13 +1,13 @@
-package com.github.ahmedwelhakim.jetbrainngxtranslatetoolkitplugin
+package com.github.ahmedwelhakim.ngxtranslateintellisense
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.NgxTranslateToolsetBundle"
+private const val BUNDLE = "messages.NgxTranslateIntellisenseBundle"
 
-object NgxTranslateToolsetBundle : DynamicBundle(BUNDLE) {
+object NgxTranslateIntellisenseBundle : DynamicBundle(BUNDLE) {
 
     @JvmStatic
     fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) =
