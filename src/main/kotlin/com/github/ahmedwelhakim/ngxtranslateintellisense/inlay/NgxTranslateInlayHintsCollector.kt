@@ -9,11 +9,35 @@ import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 
+/**
+ * Collector that generates inlay hints for ngx-translate translation keys.
+ * 
+ * This class is responsible for finding translation keys in the code and
+ * creating inlay hints that display the corresponding translation values.
+ * It processes JavaScript string literals and checks if they match known
+ * translation keys, then displays the translation text as an inline hint.
+ * 
+ * The hints are displayed with a rounded background and are truncated
+ * according to the configured maximum length to maintain readability.
+ */
 @Suppress("UnstableApiUsage")
 class NgxTranslateInlayHintsCollector(
     editor: Editor
 ) : FactoryInlayHintsCollector(editor) {
 
+    /**
+     * Collects inlay hints for the given PSI element.
+     * 
+     * This method processes each element in the file and creates inlay hints
+     * for JavaScript string literals that represent translation keys. The hints
+     * are displayed with the actual translation text, truncated to the configured
+     * maximum length.
+     * 
+     * @param element The PSI element to process
+     * @param editor The editor where hints will be displayed
+     * @param sink The sink for collecting inlay hints
+     * @return true to continue processing, false to stop
+     */
     override fun collect(element: PsiElement, editor: Editor, sink: InlayHintsSink): Boolean {
         val config = element.project.getService(NgxTranslateConfigurationStateService::class.java)
         if (!config.state.inlayHintEnabled) return true

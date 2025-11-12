@@ -14,6 +14,18 @@ import com.intellij.ui.components.JBTextField
 import com.intellij.util.ui.FormBuilder
 import javax.swing.*
 
+/**
+ * Settings configurable class for the NgxTranslateIntellisense plugin.
+ * 
+ * This class provides the UI for configuring plugin settings such as:
+ * - Default language for translations
+ * - Inlay hints display and length
+ * - Auto-discovery of translation directories
+ * - Manual configuration of translation file paths
+ * 
+ * It integrates with IntelliJ's settings system to provide a dedicated
+ * configuration panel in the IDE settings dialog.
+ */
 class NgxTranslateSettingsConfigurable(private val project: Project) : Configurable {
     private val service = NgxTranslateConfigurationStateService.getInstance(project)
 
@@ -112,8 +124,18 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
             .panel
     }
 
+    /**
+     * Creates the main settings panel component.
+     * 
+     * @return The configured JPanel containing all settings controls
+     */
     override fun createComponent(): JComponent = panel
 
+    /**
+     * Checks if any settings have been modified by the user.
+     * 
+     * @return true if settings have been changed from their saved values, false otherwise
+     */
     override fun isModified(): Boolean {
         val state = service.state
         return langField.text != state.lang ||
@@ -123,6 +145,12 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                 pathsModel.elements().toList() != state.i18nPaths
     }
 
+    /**
+     * Applies the current UI values to the persistent settings storage.
+     * 
+     * This method saves all settings from the UI components to the project's
+     * configuration state service, making them persistent across IDE sessions.
+     */
     override fun apply() {
         service.saveSettings(
             langField.text,
@@ -133,6 +161,12 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         )
     }
 
+    /**
+     * Resets the UI components to match the current saved settings.
+     * 
+     * This method loads the current settings from the configuration service
+     * and updates all UI components to display those values.
+     */
     override fun reset() {
         val state = service.state
         langField.text = state.lang
@@ -143,5 +177,10 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         state.i18nPaths.forEach { pathsModel.addElement(it) }
     }
 
+    /**
+     * Returns the display name for this settings panel.
+     * 
+     * @return The localized display name for the ngx-translate settings
+     */
     override fun getDisplayName(): String = NgxTranslateIntellisenseBundle.message("ngxTranslateIntellisense")
 }

@@ -23,11 +23,30 @@ import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 
+/**
+ * Tool window component that displays and manages translation files in the IntelliJ IDE.
+ * 
+ * This class creates a tree view of translation directories and their JSON files,
+ * providing quick access to translation assets. It includes settings and refresh buttons,
+ * and automatically updates when files change in the configured translation directories.
+ * 
+ * The tool window integrates with the IDE's tool window system to provide a dedicated
+ * panel for managing ngx-translate translation files.
+ */
 class NgxTranslateToolWindow() {
     private lateinit var tree: Tree
     private lateinit var treeModel: DefaultTreeModel
     private lateinit var project: Project
 
+    /**
+     * Creates and returns the main content panel for the tool window.
+     * 
+     * This method builds the complete UI including the translation directories tree,
+     * settings button, refresh button, and sets up file system listeners for auto-refresh.
+     * 
+     * @param project The IntelliJ project instance
+     * @return The main JPanel containing all tool window components
+     */
     fun getContent(project: Project): JPanel {
         this.project = project
         val stateService = NgxTranslateConfigurationStateService.getInstance(project)
@@ -87,6 +106,12 @@ class NgxTranslateToolWindow() {
         }
     }
 
+    /**
+     * Refreshes the translation directories tree with current project state.
+     * 
+     * This method rebuilds the entire tree structure from the current configuration,
+     * ensuring the UI reflects any changes in translation directories or files.
+     */
     private fun refreshTree() {
         val stateService = NgxTranslateConfigurationStateService.getInstance(project)
         val state = stateService.state
@@ -117,6 +142,13 @@ class NgxTranslateToolWindow() {
         }
     }
 
+    /**
+     * Creates a tree component showing translation directories and their JSON files.
+     * 
+     * @param project The IntelliJ project instance
+     * @param i18nPaths List of configured translation directory paths
+     * @return A configured Tree component with custom rendering and mouse listeners
+     */
     private fun createTranslationDirectoriesTree(project: Project, i18nPaths: List<String>): Tree {
         val root = DefaultMutableTreeNode("Translation Directories")
         treeModel = DefaultTreeModel(root)
@@ -206,6 +238,18 @@ class NgxTranslateToolWindow() {
         return tree
     }
 
+    /**
+     * Data class representing a directory node in the translation tree.
+     * 
+     * @param path The absolute file system path to the directory
+     */
     private data class DirectoryNode(val path: String)
+    
+    /**
+     * Data class representing a file node in the translation tree.
+     * 
+     * @param name The display name of the file
+     * @param path The absolute file system path to the file
+     */
     private data class FileNode(val name: String, val path: String)
 }
