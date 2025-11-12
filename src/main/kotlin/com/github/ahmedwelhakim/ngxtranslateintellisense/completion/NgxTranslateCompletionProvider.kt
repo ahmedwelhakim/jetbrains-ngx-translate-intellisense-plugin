@@ -1,5 +1,6 @@
 package com.github.ahmedwelhakim.ngxtranslateintellisense.completion
 
+import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateUtils
 import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateTranslationCache
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionProvider
@@ -33,6 +34,10 @@ class NgxTranslateCompletionProvider : CompletionProvider<CompletionParameters>(
         result: CompletionResultSet
     ) {
         val project = parameters.editor.project ?: return
+        
+        // Only provide completions for Angular/Nx projects with ngx-translate
+        if (!NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)) return
+        
         project.getService(NgxTranslateTranslationCache::class.java).getAllKeys().forEach { key ->
             result.addElement(
                 LookupElementBuilder

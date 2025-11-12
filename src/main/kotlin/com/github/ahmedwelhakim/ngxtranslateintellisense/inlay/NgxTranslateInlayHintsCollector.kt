@@ -39,13 +39,17 @@ class NgxTranslateInlayHintsCollector(
      * @return true to continue processing, false to stop
      */
     override fun collect(element: PsiElement, editor: Editor, sink: InlayHintsSink): Boolean {
-        val config = element.project.getService(NgxTranslateConfigurationStateService::class.java)
+        val project = element.project
+        
+        // Only provide inlay hints for Angular/Nx projects with ngx-translate
+        if (!NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)) return true
+        
+        val config = project.getService(NgxTranslateConfigurationStateService::class.java)
         if (!config.state.inlayHintEnabled) return true
         // Only process string literals
         val literal = element as? JSLiteralExpression ?: return true
         val key = literal.stringValue ?: return true
 
-        val project = element.project
         val cache = project.getService(NgxTranslateTranslationCache::class.java)
         if (!cache.hasKey(key)) return true
 

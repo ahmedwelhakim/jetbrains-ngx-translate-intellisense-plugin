@@ -1,5 +1,6 @@
 package com.github.ahmedwelhakim.ngxtranslateintellisense.reference
 
+import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateUtils
 import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateTranslationCache
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.psi.PsiElement
@@ -33,8 +34,12 @@ class NgxTranslateReferenceProvider : PsiReferenceProvider() {
         element: PsiElement,
         context: ProcessingContext
     ): Array<out PsiReference?> {
-        val key = (element as? JSLiteralExpression)?.stringValue ?: return PsiReference.EMPTY_ARRAY
         val project = element.project
+        
+        // Only provide references for Angular/Nx projects with ngx-translate
+        if (!NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)) return PsiReference.EMPTY_ARRAY
+        
+        val key = (element as? JSLiteralExpression)?.stringValue ?: return PsiReference.EMPTY_ARRAY
         val cache = project.getService(NgxTranslateTranslationCache::class.java)
         if (!cache.hasKey(key)) return PsiReference.EMPTY_ARRAY
         return arrayOf(NgxTranslateReference(element, key))

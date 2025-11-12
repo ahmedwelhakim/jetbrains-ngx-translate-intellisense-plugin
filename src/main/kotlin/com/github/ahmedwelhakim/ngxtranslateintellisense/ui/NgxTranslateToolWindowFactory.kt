@@ -1,5 +1,6 @@
 package com.github.ahmedwelhakim.ngxtranslateintellisense.ui
 
+import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateUtils
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -37,5 +38,6 @@ class NgxTranslateToolWindowFactory : ToolWindowFactory {
      * @param project The project to check availability for
      * @return true if the tool window should be available, false otherwise
      */
-    override fun shouldBeAvailable(project: Project) = true
+    override fun shouldBeAvailable(project: Project) = 
+        NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)
 }
