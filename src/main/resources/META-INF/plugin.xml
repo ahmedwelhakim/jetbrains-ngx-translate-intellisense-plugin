@@ -41,6 +41,7 @@
                 instance="com.github.ahmedwelhakim.ngxtranslateintellisense.settings.NgxTranslateSettingsConfigurable"
                 displayName="Ngx Translate Intellisense"
                 id="com.github.ahmedwelhakim.ngxtranslateintellisense.settings"
+                parentId="tools"
         />
     </extensions>
 </idea-plugin>
