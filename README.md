@@ -11,7 +11,7 @@ translation definitions, and a dedicated tool window for browsing translations. 
 with efficient caching and supports multiple locale file formats commonly used in Angular applications.
 <!-- Plugin description end -->
 
-![Build](https://github.com/ahmedwelhakim/jetbrain-ngx-translate-toolkit-plugin/workflows/Build/badge.svg)
+![Build](https://github.com/ahmedwelhakim/jetbrain-ngx-translate-intellisense-plugin/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 
@@ -24,12 +24,6 @@ with efficient caching and supports multiple locale file formats commonly used i
 - **🪟 Dedicated Tool Window** - Browse and manage all your translation files from a convenient side panel
 - **⚡ High Performance** - Efficient caching ensures minimal impact on IDE performance
 - **🎯 Project Detection** - Automatically activates for Angular and Nx projects with ngx-translate
-
-## Supported Languages
-
-- TypeScript
-- Angular (Angular2, Angular2Html)
-- JavaScript (basic support)
 
 ## Installation
 
