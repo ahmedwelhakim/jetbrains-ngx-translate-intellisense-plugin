@@ -36,7 +36,7 @@ with efficient caching and supports multiple locale file formats commonly used i
 ### Manual Installation
 
 1. Download the latest release
-   from [GitHub Releases](https://github.com/ahmedwelhakim/jetbrain-ngx-translate-toolkit-plugin/releases/latest)
+   from [GitHub Releases](https://github.com/ahmedwelhakim/jetbrain-ngx-translate-intellisense-plugin/releases/latest)
 2. Go to **File** → **Settings** → **Plugins**
 3. Click the gear icon ⚙️ and select **Install plugin from disk...**
 4. Choose the downloaded plugin file
@@ -129,6 +129,6 @@ See [CHANGELOG.md](CHANGELOG.md) for a list of changes and version history.
 
 If you encounter any issues or have feature requests, please:
 
-- Check existing [GitHub Issues](https://github.com/ahmedwelhakim/jetbrain-ngx-translate-toolkit-plugin/issues)
+- Check existing [GitHub Issues](https://github.com/ahmedwelhakim/jetbrain-ngx-translate-intellisense-plugin/issues)
 - Create a new issue with detailed information
 - Include your IDE version and plugin version
