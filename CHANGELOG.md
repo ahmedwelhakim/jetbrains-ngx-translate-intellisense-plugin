@@ -16,5 +16,6 @@
 - Inlay hints for translation values
 - Reference navigation for translation keys
 
-[Unreleased]: https://github.com/ahmedwelhakim/jetbrain-ngx-translate-intellisense-plugin/compare/v0.0.1...HEAD
-[0.0.1]: https://github.com/ahmedwelhakim/jetbrain-ngx-translate-intellisense-plugin/commits/v0.0.1
+[Unreleased]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v0.0.1...HEAD
+
+[0.0.1]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/commits/v0.0.1
