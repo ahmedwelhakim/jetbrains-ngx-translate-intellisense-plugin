@@ -42,7 +42,7 @@ object NgxTranslateUtils {
      */
     fun isTranslationDirectoryNotEmpty(directoryPath: String): Boolean {
         val dir = VirtualFileManager.getInstance().findFileByUrl("file://$directoryPath") ?: return false
-        return dir.children?.isNotEmpty() == true && dir.children.all(::isTranslationFile)
+        return dir.children?.isNotEmpty() == true && dir.children.any { it.extension == "json" }
     }
 
     /**
@@ -93,23 +93,23 @@ object NgxTranslateUtils {
      */
     fun isAngularOrNxProjectWithNgxTranslate(project: Project): Boolean {
         val projectBasePath = project.basePath ?: return false
-        
+
         // Quick check: only look at root package.json
         val packageJsonFile = VirtualFileManager.getInstance()
             .findFileByUrl("file://$projectBasePath/package.json") ?: return false
-        
+
         return try {
             ReadAction.compute<String, Exception> {
                 val psiFile = PsiManager.getInstance(project).findFile(packageJsonFile)
                 psiFile?.text
             }?.let { content ->
                 // Must have ngx-translate
-                content.contains("@ngx-translate/core") && 
-                // Angular or Nx project
-                (content.contains("@angular/core") || 
-                 Files.exists(Paths.get(projectBasePath, "angular.json")) ||
-                 Files.exists(Paths.get(projectBasePath, "nx.json")) ||
-                 content.contains("@nx/workspace"))
+                content.contains("@ngx-translate/core") &&
+                        // Angular or Nx project
+                        (content.contains("@angular/core") ||
+                                Files.exists(Paths.get(projectBasePath, "angular.json")) ||
+                                Files.exists(Paths.get(projectBasePath, "nx.json")) ||
+                                content.contains("@nx/workspace"))
             } ?: false
         } catch (e: Exception) {
             false

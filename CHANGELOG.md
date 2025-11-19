@@ -4,17 +4,20 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix bug of directory does not contain translation files if it contains subdirectories
+
 ## [0.0.1] - 2025-11-13
 
 ### Added
 
-- Initial scaffold created
-  from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)
 - Ngx Translate Intellisense plugin for IntelliJ IDEA
 - Tool window for translation file management
 - Auto-completion support for ngx-translate keys
 - Inlay hints for translation values
 - Reference navigation for translation keys
+- Support for multiple translation directories
 
 [Unreleased]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v0.0.1...HEAD
 
