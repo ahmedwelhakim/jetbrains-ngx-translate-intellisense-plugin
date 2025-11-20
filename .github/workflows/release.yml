@@ -63,7 +63,12 @@ jobs:
           CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
-        run: ./gradlew publishPlugin
+        run: |
+          # Decode certificate chain and private key from base64 and keep in same variables
+          export CERTIFICATE_CHAIN=$(echo "$CERTIFICATE_CHAIN" | base64 -d)
+          export PRIVATE_KEY=$(echo "$PRIVATE_KEY" | base64 -d)
+          
+          ./gradlew publishPlugin
 
       # Upload an artifact as a release asset
       - name: Upload Release Asset
