@@ -37,6 +37,13 @@
                 language="Angular2Html"
                 implementationClass="com.github.ahmedwelhakim.ngxtranslateintellisense.inlay.NgxTranslateInlayHintsProvider"/>
 
+        <lang.foldingBuilder
+                language="TypeScript"
+                implementationClass="com.github.ahmedwelhakim.ngxtranslateintellisense.folding.NgxTranslateFoldingBuilder"/>
+        <lang.foldingBuilder
+                language="Angular2Html"
+                implementationClass="com.github.ahmedwelhakim.ngxtranslateintellisense.folding.NgxTranslateFoldingBuilder"/>
+
         <projectConfigurable
                 instance="com.github.ahmedwelhakim.ngxtranslateintellisense.settings.NgxTranslateSettingsConfigurable"
                 displayName="Ngx Translate Intellisense"

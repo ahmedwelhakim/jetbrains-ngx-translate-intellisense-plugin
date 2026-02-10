@@ -2,7 +2,11 @@ package com.github.ahmedwelhakim.ngxtranslateintellisense.services
 
 import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateConstants
 import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateUtils
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer
+import com.intellij.codeInsight.folding.CodeFoldingManager
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.*
+import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
@@ -39,6 +43,7 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         var i18nPaths by list<String>()          // unified list
         var inlayHintLength by property(40)
         var inlayHintEnabled by property(true)
+        var foldKeyEnabled by property(false)
         var autoDiscoveryEnabled by property(true)
     }
 
@@ -73,13 +78,23 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         paths: MutableList<String>,
         inlayHintLength: Int,
         inlayHintEnabled: Boolean,
+        foldKeyEnabled: Boolean,
         autoDiscoveryEnabled: Boolean
     ) {
         state.lang = NgxTranslateUtils.toSystemIndependent(lang)
         state.i18nPaths = NgxTranslateUtils.toSystemIndependent(paths)
         state.inlayHintLength = inlayHintLength
         state.inlayHintEnabled = inlayHintEnabled
+        state.foldKeyEnabled = foldKeyEnabled
         state.autoDiscoveryEnabled = autoDiscoveryEnabled
+
+        DaemonCodeAnalyzer.getInstance(project).restart()
+        ApplicationManager.getApplication().invokeLater {
+            val foldingManager = CodeFoldingManager.getInstance(project)
+            EditorFactory.getInstance().allEditors
+                .filter { it.project == project }
+                .forEach { foldingManager.updateFoldRegions(it) }
+        }
     }
 
     /**
