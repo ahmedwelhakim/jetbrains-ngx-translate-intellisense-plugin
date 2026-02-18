@@ -42,8 +42,8 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         var lang by string("en")
         var i18nPaths by list<String>()          // unified list
         var inlayHintLength by property(40)
-        var inlayHintEnabled by property(true)
-        var foldKeyEnabled by property(false)
+        var inlayHintEnabled by property(false)
+        var foldKeyEnabled by property(true)
         var autoDiscoveryEnabled by property(true)
     }
 
