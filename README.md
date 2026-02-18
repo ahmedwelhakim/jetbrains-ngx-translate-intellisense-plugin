@@ -63,6 +63,25 @@ Translation values appear inline next to your keys:
 this.translateService.instant('welcome.message') // "Welcome to our application!"
 ```
 
+### Code Folding
+
+Translation values override i18n keys, when you enable "Hide Translation Keys" in the plugin setting :
+
+``` html
+<h1>{{'SYSTEM.WELCOME.HELLO'|translate}}</h1>
+
+// now display as below with code folding background:
+<h1>你好</h1>
+```
+
+
+![code-folding](code-folding.gif)
+
+when you click on translation values, it will switch back to i18n keys
+
+and when you click on other line, i18n keys will automaticly display as translation values
+
+
 ### Reference Navigation
 
 Click on any translation key while holding `Ctrl` (or `Cmd` on Mac) to jump directly to its definition in your JSON

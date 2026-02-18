@@ -33,6 +33,7 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
     private val inlayLengthSpinner = JSpinner(SpinnerNumberModel(40, 10, 200, 5))
     private val autoDiscoveryCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("enableAutoDiscovery"))
     private val inlayHintsCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("enableInlayHints"))
+    private val foldKeyCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("hideTranslationKeys"))
     private val pathsModel = DefaultListModel<String>()
     private val pathsList = JBList(pathsModel)
 
@@ -92,6 +93,12 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
 
         val listPanel = decorator.createPanel()
 
+        foldKeyCheckbox.addChangeListener {
+            val foldEnabled = foldKeyCheckbox.isSelected
+            inlayHintsCheckbox.isEnabled = !foldEnabled
+            if (foldEnabled) inlayHintsCheckbox.isSelected = false
+        }
+
         panel = FormBuilder.createFormBuilder()
             .addLabeledComponent(
                 JBLabel(NgxTranslateIntellisenseBundle.message("defaultLanguageLabel")),
@@ -102,6 +109,12 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
             .addLabeledComponent(
                 JBLabel(NgxTranslateIntellisenseBundle.message("enableInlayHintsLabel")),
                 inlayHintsCheckbox,
+                1,
+                false
+            )
+            .addLabeledComponent(
+                JBLabel(NgxTranslateIntellisenseBundle.message("hideTranslationKeysLabel")),
+                foldKeyCheckbox,
                 1,
                 false
             )
@@ -142,6 +155,7 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                 (inlayLengthSpinner.value as Int) != state.inlayHintLength ||
                 autoDiscoveryCheckbox.isSelected != state.autoDiscoveryEnabled ||
                 inlayHintsCheckbox.isSelected != state.inlayHintEnabled ||
+                foldKeyCheckbox.isSelected != state.foldKeyEnabled ||
                 pathsModel.elements().toList() != state.i18nPaths
     }
 
@@ -157,6 +171,7 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
             pathsModel.elements().toList().toMutableList(),
             inlayLengthSpinner.value as Int,
             inlayHintsCheckbox.isSelected,
+            foldKeyCheckbox.isSelected,
             autoDiscoveryCheckbox.isSelected
         )
     }
@@ -173,6 +188,8 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         inlayLengthSpinner.value = state.inlayHintLength
         autoDiscoveryCheckbox.isSelected = state.autoDiscoveryEnabled
         inlayHintsCheckbox.isSelected = state.inlayHintEnabled
+        foldKeyCheckbox.isSelected = state.foldKeyEnabled
+        inlayHintsCheckbox.isEnabled = !state.foldKeyEnabled
         pathsModel.clear()
         state.i18nPaths.forEach { pathsModel.addElement(it) }
     }

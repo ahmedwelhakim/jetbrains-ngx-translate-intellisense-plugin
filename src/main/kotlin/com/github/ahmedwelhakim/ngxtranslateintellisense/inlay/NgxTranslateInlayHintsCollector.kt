@@ -46,6 +46,7 @@ class NgxTranslateInlayHintsCollector(
         
         val config = project.getService(NgxTranslateConfigurationStateService::class.java)
         if (!config.state.inlayHintEnabled) return true
+        if (config.state.foldKeyEnabled) return true
         // Only process string literals
         val literal = element as? JSLiteralExpression ?: return true
         val key = literal.stringValue ?: return true
