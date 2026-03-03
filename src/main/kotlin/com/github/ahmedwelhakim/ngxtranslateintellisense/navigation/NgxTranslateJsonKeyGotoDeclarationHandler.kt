@@ -167,7 +167,7 @@ class NgxTranslateJsonKeyGotoDeclarationHandler : GotoDeclarationHandler {
         }
 
         val popup: JBPopup = PopupChooserBuilder(list)
-            .setTitle("选择声明")
+            .setTitle("Select Usage")
             .setResizable(true)
             .setMovable(true)
             .setMinSize(Dimension(JBUI.scale(720), JBUI.scale(160)))
