@@ -44,6 +44,9 @@
                 language="Angular2Html"
                 implementationClass="com.github.ahmedwelhakim.ngxtranslateintellisense.folding.NgxTranslateFoldingBuilder"/>
 
+        <gotoDeclarationHandler
+                implementation="com.github.ahmedwelhakim.ngxtranslateintellisense.navigation.NgxTranslateJsonKeyGotoDeclarationHandler"/>
+
         <projectConfigurable
                 instance="com.github.ahmedwelhakim.ngxtranslateintellisense.settings.NgxTranslateSettingsConfigurable"
                 displayName="Ngx Translate Intellisense"
