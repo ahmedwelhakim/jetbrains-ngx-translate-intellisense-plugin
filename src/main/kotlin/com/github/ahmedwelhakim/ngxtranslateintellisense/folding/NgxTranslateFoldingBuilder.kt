@@ -31,7 +31,7 @@ class NgxTranslateFoldingBuilder : FoldingBuilderEx() {
 
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
         val project = root.project
-        if (!NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)) return emptyArray()
+        if (!NgxTranslateUtils.isSupportedProject(project)) return emptyArray()
 
         val config = project.getService(NgxTranslateConfigurationStateService::class.java)
         if (!config.state.foldKeyEnabled) return emptyArray()

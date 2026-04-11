@@ -36,7 +36,7 @@ class NgxTranslateCompletionProvider : CompletionProvider<CompletionParameters>(
         val project = parameters.editor.project ?: return
         
         // Only provide completions for Angular/Nx projects with ngx-translate
-        if (!NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)) return
+        if (!NgxTranslateUtils.isSupportedProject(project)) return
         
         project.getService(NgxTranslateTranslationCache::class.java).getAllKeys().forEach { key ->
             result.addElement(

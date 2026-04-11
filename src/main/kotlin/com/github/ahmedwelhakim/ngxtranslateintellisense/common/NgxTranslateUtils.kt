@@ -81,17 +81,18 @@ object NgxTranslateUtils {
         list.map { toSystemIndependent(it) }.toMutableList()
 
     /**
-     * Checks if the project is an Angular project or Nx project that contains ngx-translate library.
+     * Checks if the project is an Angular project or Nx project that contains ngx-translate library or Transloco library.
      *
      * This method verifies:
      * 1. If the project has package.json with @ngx-translate/core dependency
+     *    Or If the project has package.json with @ngx-translate/core dependency
      * 2. If it's an Angular project (has angular.json or @angular/core in package.json)
      * 3. If it's a Nx project (has nx.json or @nx/workspace in package.json)
      *
      * @param project The IntelliJ project instance
      * @return true if the project is Angular/Nx with ngx-translate, false otherwise
      */
-    fun isAngularOrNxProjectWithNgxTranslate(project: Project): Boolean {
+    fun isSupportedProject(project: Project): Boolean {
         val projectBasePath = project.basePath ?: return false
 
         // Quick check: only look at root package.json
@@ -104,7 +105,7 @@ object NgxTranslateUtils {
                 psiFile?.text
             }?.let { content ->
                 // Must have ngx-translate
-                content.contains("@ngx-translate/core") &&
+                (content.contains("@ngx-translate/core") || content.contains("@jsverse/transloco")) &&
                         // Angular or Nx project
                         (content.contains("@angular/core") ||
                                 Files.exists(Paths.get(projectBasePath, "angular.json")) ||

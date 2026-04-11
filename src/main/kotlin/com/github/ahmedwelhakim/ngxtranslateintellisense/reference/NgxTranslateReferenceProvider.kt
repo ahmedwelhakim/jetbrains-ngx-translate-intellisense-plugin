@@ -37,7 +37,7 @@ class NgxTranslateReferenceProvider : PsiReferenceProvider() {
         val project = element.project
         
         // Only provide references for Angular/Nx projects with ngx-translate
-        if (!NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)) return PsiReference.EMPTY_ARRAY
+        if (!NgxTranslateUtils.isSupportedProject(project)) return PsiReference.EMPTY_ARRAY
         
         val key = (element as? JSLiteralExpression)?.stringValue ?: return PsiReference.EMPTY_ARRAY
         val cache = project.getService(NgxTranslateTranslationCache::class.java)

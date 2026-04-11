@@ -1,7 +1,8 @@
 # ngx-translate-intellisense
 
 <!-- Plugin description -->
-This IntelliJ IDEA plugin enhances the development experience for Angular applications using ngx-translate. It provides
+This IntelliJ IDEA plugin enhances the development experience for Angular applications using `ngx-translate` or `@jsverse/transloco`. 
+It provides
 intelligent code completion, inline hints, and navigation features for translation keys, making internationalization
 development more efficient and enjoyable. The plugin automatically detects Angular and Nx projects with ngx-translate
 installed and seamlessly integrates with your existing workflow.
@@ -19,8 +20,10 @@ with efficient caching and supports multiple locale file formats commonly used i
 
 - **🔧 Smart Code Completion** - Get intelligent autocomplete for translation keys in your TypeScript and Angular
   templates
-- **👁️ Inlay Hints** - See translation values displayed inline with your code for better context
+- **👁️ Inlay Hints** - See translation values displayed inline with your code for better context.
+- **👁️ Code Folding** - See translation Keys as folded translation value.
 - **🔗 Reference Navigation** - Jump directly to translation definitions with Ctrl+Click / Cmd+Click
+- **🔗 Usage Reference Navigation** - Jump directly to Usage Keys with Ctrl+Click / Cmd+Click on the Key in Json file.
 - **🪟 Dedicated Tool Window** - Browse and manage all your translation files from a convenient side panel
 - **⚡ High Performance** - Efficient caching ensures minimal impact on IDE performance
 - **🎯 Project Detection** - Automatically activates for Angular and Nx projects with ngx-translate
@@ -86,6 +89,11 @@ and when you click on other line, i18n keys will automaticly display as translat
 
 Click on any translation key while holding `Ctrl` (or `Cmd` on Mac) to jump directly to its definition in your JSON
 translation files.
+
+### Translation Usage Navigation form json to usages in HTML/Ts
+Click `Ctrl/Cmd + click` on any translation key in JSON file to jump to its usage in HTML/Ts files.
+
+![img.png](img.png)
 
 ### Tool Window
 

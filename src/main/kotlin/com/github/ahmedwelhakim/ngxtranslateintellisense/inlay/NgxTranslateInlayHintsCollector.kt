@@ -42,7 +42,7 @@ class NgxTranslateInlayHintsCollector(
         val project = element.project
         
         // Only provide inlay hints for Angular/Nx projects with ngx-translate
-        if (!NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)) return true
+        if (!NgxTranslateUtils.isSupportedProject(project)) return true
         
         val config = project.getService(NgxTranslateConfigurationStateService::class.java)
         if (!config.state.inlayHintEnabled) return true

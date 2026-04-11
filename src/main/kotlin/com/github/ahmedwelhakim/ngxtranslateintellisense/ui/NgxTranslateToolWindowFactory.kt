@@ -39,5 +39,5 @@ class NgxTranslateToolWindowFactory : ToolWindowFactory {
      * @return true if the tool window should be available, false otherwise
      */
     override fun shouldBeAvailable(project: Project) = 
-        NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)
+        NgxTranslateUtils.isSupportedProject(project)
 }

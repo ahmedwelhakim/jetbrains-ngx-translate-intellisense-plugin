@@ -44,7 +44,7 @@ class NgxTranslateJsonKeyGotoDeclarationHandler : GotoDeclarationHandler {
         val element = sourceElement ?: return null
         val project = element.project
 
-        if (!NgxTranslateUtils.isAngularOrNxProjectWithNgxTranslate(project)) return null
+        if (!NgxTranslateUtils.isSupportedProject(project)) return null
 
         val file = element.containingFile ?: return null
         val virtualFile = file.virtualFile ?: return null
