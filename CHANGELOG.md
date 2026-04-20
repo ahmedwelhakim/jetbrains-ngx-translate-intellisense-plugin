@@ -4,13 +4,10 @@
 
 ## [Unreleased]
 
-### Changed
+### Added
 
-- Add Code Folding Feature: Users can now fold translation keys and values in the editor for better readability and
-  navigation
-- Adjusted default feature flags for improved user experience:
-    - Inlay hints are now disabled by default (users can opt-in via settings)
-    - Code folding is now enabled by default for better code readability
+- Make completion work after pressing `Ctrl + Space` more than once excluding the first time
+- Add completion in Smart Completion by pressing `Ctrl + Shift + Space`
 
 ## [0.0.2]
 

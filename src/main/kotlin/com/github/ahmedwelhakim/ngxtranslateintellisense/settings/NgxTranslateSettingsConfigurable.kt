@@ -34,6 +34,7 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
     private val autoDiscoveryCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("enableAutoDiscovery"))
     private val inlayHintsCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("enableInlayHints"))
     private val foldKeyCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("hideTranslationKeys"))
+    private val addToSmartCompletionCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("addToSmartCompletion"))
     private val pathsModel = DefaultListModel<String>()
     private val pathsList = JBList(pathsModel)
 
@@ -130,6 +131,12 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                 1,
                 false
             )
+            .addLabeledComponent(
+                JBLabel(NgxTranslateIntellisenseBundle.message("completion")),
+                addToSmartCompletionCheckbox,
+                1,
+                false
+            )
             .addSeparator()
             .addComponent(JBLabel(NgxTranslateIntellisenseBundle.message("translationFoldersLabel")))
             .addComponent(listPanel)
@@ -156,6 +163,7 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                 autoDiscoveryCheckbox.isSelected != state.autoDiscoveryEnabled ||
                 inlayHintsCheckbox.isSelected != state.inlayHintEnabled ||
                 foldKeyCheckbox.isSelected != state.foldKeyEnabled ||
+                addToSmartCompletionCheckbox.isSelected != state.addToSmartCompletion ||
                 pathsModel.elements().toList() != state.i18nPaths
     }
 
@@ -172,7 +180,8 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
             inlayLengthSpinner.value as Int,
             inlayHintsCheckbox.isSelected,
             foldKeyCheckbox.isSelected,
-            autoDiscoveryCheckbox.isSelected
+            autoDiscoveryCheckbox.isSelected,
+            addToSmartCompletionCheckbox.isSelected
         )
     }
 
@@ -189,6 +198,7 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         autoDiscoveryCheckbox.isSelected = state.autoDiscoveryEnabled
         inlayHintsCheckbox.isSelected = state.inlayHintEnabled
         foldKeyCheckbox.isSelected = state.foldKeyEnabled
+        addToSmartCompletionCheckbox.isSelected = state.addToSmartCompletion
         inlayHintsCheckbox.isEnabled = !state.foldKeyEnabled
         pathsModel.clear()
         state.i18nPaths.forEach { pathsModel.addElement(it) }

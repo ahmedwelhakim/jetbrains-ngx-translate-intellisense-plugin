@@ -45,6 +45,7 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         var inlayHintEnabled by property(false)
         var foldKeyEnabled by property(true)
         var autoDiscoveryEnabled by property(true)
+        var addToSmartCompletion by property(true)
     }
 
     init {
@@ -79,7 +80,8 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         inlayHintLength: Int,
         inlayHintEnabled: Boolean,
         foldKeyEnabled: Boolean,
-        autoDiscoveryEnabled: Boolean
+        autoDiscoveryEnabled: Boolean,
+        useSmartCompletion: Boolean = false
     ) {
         state.lang = NgxTranslateUtils.toSystemIndependent(lang)
         state.i18nPaths = NgxTranslateUtils.toSystemIndependent(paths)
@@ -87,6 +89,7 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         state.inlayHintEnabled = inlayHintEnabled
         state.foldKeyEnabled = foldKeyEnabled
         state.autoDiscoveryEnabled = autoDiscoveryEnabled
+        state.addToSmartCompletion = useSmartCompletion
 
         DaemonCodeAnalyzer.getInstance(project).restart()
         ApplicationManager.getApplication().invokeLater {
