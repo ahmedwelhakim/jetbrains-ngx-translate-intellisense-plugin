@@ -4,11 +4,15 @@
 
 ## [Unreleased]
 
+- Add Missing Translation Keys Detection in Tool Window
+- Add Error Annotator on extra fields in translation files
+
+## [1.2.0]
+
 ### Added
 
 - Make completion work after pressing `Ctrl + Space` more than once excluding the first time
 - Add completion in Smart Completion by pressing `Ctrl + Shift + Space`
-- Show tool window warnings when translation files in an i18n folder have mismatched key sets
 
 ## [0.0.2]
 

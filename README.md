@@ -25,6 +25,8 @@ with efficient caching and supports multiple locale file formats commonly used i
 - **🔗 Reference Navigation** - Jump directly to translation definitions with Ctrl+Click / Cmd+Click
 - **🔗 Usage Reference Navigation** - Jump directly to Usage Keys with Ctrl+Click / Cmd+Click on the Key in Json file.
 - **🪟 Dedicated Tool Window** - Browse and manage all your translation files from a convenient side panel
+- **⚠️ Missing Keys Detection** - Detect missing and extra translation keys across locale files directly in the tool window
+- **🚨 JSON Extra Key Error Annotation** - Highlight extra keys in translation JSON files to keep locale files consistent
 - **⚡ High Performance** - Efficient caching ensures minimal impact on IDE performance
 - **🎯 Project Detection** - Automatically activates for Angular and Nx projects with ngx-translate
 
@@ -102,6 +104,19 @@ Access the translation browser from the right side panel to:
 - View all translation keys and their values
 - Navigate between different locale files
 - Quickly search for specific translations
+- Review warnings for missing and extra keys between locale JSON files
+
+### Missing Keys Detection
+
+When locale JSON files inside the same translation folder do not share the same key set, the tool window shows a warning block with:
+
+- Missing keys per file
+- Extra keys per file
+- Clickable key links to jump directly to the best matching JSON location
+
+### Extra Fields Error Annotation
+
+In JSON translation files, extra keys that do not align with the shared locale structure are highlighted as errors to help you quickly clean up inconsistent entries.
 
 ## Configuration
 
@@ -112,11 +127,12 @@ Configure the plugin settings via **File** → **Settings** → **Tools** → **
 - **File Patterns**: Customize file naming conventions for translation files
 
 The tool window shows warnings when locale JSON files in the same folder have mismatched key sets.
+JSON files also show error annotations for extra keys that are not part of the common locale key structure.
 
 ## Requirements
 
-- IntelliJ IDEA Ultimate 2024.3 or later
-- WebStorm 2024.3 or later
+- IntelliJ IDEA Ultimate 2025.1 or later
+- WebStorm 2025.1 or later
 - Angular plugin enabled
 - Project must use @ngx-translate/core
 

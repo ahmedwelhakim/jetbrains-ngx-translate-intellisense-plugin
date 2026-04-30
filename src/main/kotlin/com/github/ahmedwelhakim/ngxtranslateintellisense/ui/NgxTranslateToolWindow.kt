@@ -1,18 +1,12 @@
 package com.github.ahmedwelhakim.ngxtranslateintellisense.ui
 
 import com.github.ahmedwelhakim.ngxtranslateintellisense.NgxTranslateIntellisenseBundle
-import com.github.ahmedwelhakim.ngxtranslateintellisense.psi.NgxTranslatePsiUtils
-import com.github.ahmedwelhakim.ngxtranslateintellisense.psi.NgxTranslatePsiUtils.TranslationKeyMismatch
-import com.github.ahmedwelhakim.ngxtranslateintellisense.psi.NgxTranslatePsiUtils.TranslationKeyMismatchType
 import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateConfigurationStateService
 import com.github.ahmedwelhakim.ngxtranslateintellisense.settings.NgxTranslateSettingsConfigurable
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.fileEditor.OpenFileDescriptor
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
@@ -21,43 +15,24 @@ import com.intellij.ui.treeStructure.Tree
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.net.URLDecoder
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JEditorPane
 import javax.swing.JPanel
-import javax.swing.JTree
 import javax.swing.event.HyperlinkEvent
-import javax.swing.tree.DefaultMutableTreeNode
-import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 
 /**
- * Tool window component that displays and manages translation files in the IntelliJ IDE.
- * 
- * This class creates a tree view of translation directories and their JSON files,
- * providing quick access to translation assets. It includes settings and refresh buttons,
- * and automatically updates when files change in the configured translation directories.
- * 
- * The tool window integrates with the IDE's tool window system to provide a dedicated
- * panel for managing ngx-translate translation files.
+ * Tool window coordinator for translation directories, key warnings, and quick actions.
  */
-class NgxTranslateToolWindow() {
-    private companion object {
-        const val WARNING_LINK_SCHEME = "ngx-translate-warning://open"
-        const val KEY_PREVIEW_LIMIT = 4
-    }
-
+class NgxTranslateToolWindow {
     private lateinit var tree: Tree
     private lateinit var treeModel: DefaultTreeModel
     private lateinit var project: Project
     private lateinit var warningPanel: JPanel
     private lateinit var warningArea: JEditorPane
+    private lateinit var warningSupport: NgxTranslateWarningSupport
 
     /**
      * Creates and returns the main content panel for the tool window.
@@ -70,30 +45,68 @@ class NgxTranslateToolWindow() {
      */
     fun getContent(project: Project): JPanel {
         this.project = project
-        val stateService = NgxTranslateConfigurationStateService.getInstance(project)
-        val state = stateService.state
+        warningSupport = NgxTranslateWarningSupport(project)
 
-        // Create tree for translation directories
-        tree = createTranslationDirectoriesTree(project, state.i18nPaths)
-        val treeScrollPane = JBScrollPane(tree)
-        warningArea = JEditorPane("text/html", "").apply {
+        val state = NgxTranslateConfigurationStateService.getInstance(project).state
+        treeModel = NgxTranslateTreeModelBuilder.createModel(state.i18nPaths)
+        tree = Tree(treeModel)
+        NgxTranslateTreeUiConfigurer.configure(tree, project)
+
+        warningArea = createWarningArea()
+        warningPanel = createWarningPanel(warningArea)
+        refreshWarnings(state.i18nPaths)
+        subscribeToVfsChanges(state.i18nPaths)
+
+        return JPanel(BorderLayout(10, 5)).apply {
+            add(JBScrollPane(tree), BorderLayout.PAGE_START)
+            add(warningPanel, BorderLayout.CENTER)
+            add(createBottomPanel(), BorderLayout.PAGE_END)
+        }
+    }
+
+    /**
+     * Refreshes the translation directories tree with current project state.
+     *
+     * This method rebuilds the entire tree structure from the current configuration,
+     * ensuring the UI reflects any changes in translation directories or files.
+     */
+    private fun refreshTree() {
+        val state = NgxTranslateConfigurationStateService.getInstance(project).state
+        treeModel.setRoot(NgxTranslateTreeModelBuilder.buildRoot(state.i18nPaths))
+        treeModel.reload()
+        NgxTranslateTreeUiConfigurer.expandAll(tree)
+        refreshWarnings(state.i18nPaths)
+    }
+
+    private fun refreshWarnings(paths: List<String>) {
+        val warningHtml = warningSupport.buildMismatchWarningHtml(paths)
+        warningPanel.isVisible = warningHtml.isNotBlank()
+        warningArea.text = warningHtml.ifBlank { warningSupport.emptyWarningsHtml() }
+        warningArea.caretPosition = 0
+    }
+
+    private fun createWarningArea(): JEditorPane {
+        return JEditorPane("text/html", "").apply {
             isEditable = false
             isOpaque = false
             putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true)
             addHyperlinkListener { event ->
                 if (event.eventType == HyperlinkEvent.EventType.ACTIVATED) {
-                    navigateFromWarningLink(event.description)
+                    warningSupport.navigateFromWarningLink(event.description)
                 }
             }
         }
-        val warningScrollPane = JBScrollPane(warningArea).apply {
+    }
 
-            border = BorderFactory.createEmptyBorder(15,15,15,15)
+    private fun createWarningPanel(content: JEditorPane): JPanel {
+        val scrollPane = JBScrollPane(content).apply {
+            border = BorderFactory.createEmptyBorder(15, 15, 15, 15)
             preferredSize = Dimension(0, 110)
             horizontalScrollBarPolicy = JBScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
         }
-        warningPanel = JPanel(BorderLayout(0, 4)).apply {
-            border = BorderFactory.createEmptyBorder(5,5,5,5)
+
+        return JPanel(BorderLayout(0, 4)).apply {
+            border = BorderFactory.createEmptyBorder(5, 5, 5, 5)
             add(
                 JLabel(
                     NgxTranslateIntellisenseBundle.message("translationKeyWarningsTitle"),
@@ -102,319 +115,45 @@ class NgxTranslateToolWindow() {
                 ),
                 BorderLayout.PAGE_START
             )
-            add(warningScrollPane, BorderLayout.CENTER)
+            add(scrollPane, BorderLayout.CENTER)
         }
-        refreshWarnings(state.i18nPaths)
+    }
 
-        // Listen for file system changes to auto-refresh
-        project.messageBus.connect().subscribe(
-            VirtualFileManager.VFS_CHANGES,
-            object : BulkFileListener {
-                override fun after(events: MutableList<out VFileEvent>) {
-                    // Refresh if any JSON files changed in translation directories
-                    if (events.any { event ->
-                            event.file?.extension == "json" &&
-                                    state.i18nPaths.any { path -> event.file?.path?.startsWith(path) == true }
-                        }) {
-                        ApplicationManager.getApplication().invokeLater {
-                            refreshTree()
-                        }
-                    }
-                }
-            }
-        )
-
-
-        // Create settings button
+    private fun createBottomPanel(): JPanel {
         val settingsButton = JButton("Settings", AllIcons.General.Settings).apply {
             addActionListener {
-                ShowSettingsUtil.getInstance()
-                    .showSettingsDialog(project, NgxTranslateSettingsConfigurable::class.java)
-                // Refresh tree after settings dialog closes
-                ApplicationManager.getApplication().invokeLater {
-                    refreshTree()
-                }
+                ShowSettingsUtil.getInstance().showSettingsDialog(project, NgxTranslateSettingsConfigurable::class.java)
+                ApplicationManager.getApplication().invokeLater { refreshTree() }
             }
         }
 
         val refreshButton = JButton("Refresh", AllIcons.General.Refresh).apply {
             addActionListener {
-                ApplicationManager.getApplication().invokeLater {
-                    refreshTree()
-                }
+                ApplicationManager.getApplication().invokeLater { refreshTree() }
             }
         }
 
-        val bottomPanel = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+        return JPanel(FlowLayout(FlowLayout.LEFT)).apply {
             add(settingsButton)
             add(refreshButton)
         }
-
-        return JPanel(BorderLayout(10, 5)).apply {
-            add(treeScrollPane, BorderLayout.PAGE_START)
-            add(warningPanel, BorderLayout.CENTER)
-            add(bottomPanel, BorderLayout.PAGE_END)
-        }
     }
 
-    /**
-     * Refreshes the translation directories tree with current project state.
-     * 
-     * This method rebuilds the entire tree structure from the current configuration,
-     * ensuring the UI reflects any changes in translation directories or files.
-     */
-    private fun refreshTree() {
-        val stateService = NgxTranslateConfigurationStateService.getInstance(project)
-        val state = stateService.state
-
-        // Clear and rebuild the tree
-        val root = DefaultMutableTreeNode("Translation Directories")
-
-        state.i18nPaths.forEach { path ->
-            val dirNode = DefaultMutableTreeNode(DirectoryNode(path))
-            root.add(dirNode)
-
-            // Add files in the directory
-            val virtualFile = VirtualFileManager.getInstance().findFileByUrl("file://$path")
-            virtualFile?.children?.forEach { file ->
-                if (!file.isDirectory && file.extension == "json") {
-                    val fileNode = DefaultMutableTreeNode(FileNode(file.name, file.path))
-                    dirNode.add(fileNode)
-                }
-            }
-        }
-
-        treeModel.setRoot(root)
-        treeModel.reload()
-        refreshWarnings(state.i18nPaths)
-
-        // Expand all nodes
-        for (i in 0 until tree.rowCount) {
-            tree.expandRow(i)
-        }
-    }
-
-    private fun refreshWarnings(paths: List<String>) {
-        val warningHtml = buildMismatchWarningHtml(paths)
-        warningPanel.isVisible = warningHtml.isNotBlank()
-        warningArea.text = warningHtml.ifBlank {
-            "<html><body>${StringUtil.escapeXmlEntities(NgxTranslateIntellisenseBundle.message("translationKeyWarningsNone"))}</body></html>"
-        }
-        warningArea.caretPosition = 0
-    }
-
-    private fun buildMismatchWarningHtml(paths: List<String>): String {
-        val folderBlocks = paths.mapNotNull { path ->
-            val consistency = NgxTranslatePsiUtils.validateTranslationKeysConsistency(project, path)
-            if (consistency.isValid) return@mapNotNull null
-
-            val fileLines = consistency.mismatchDetails.entries
-                .sortedBy { it.key }
-                .joinToString("") { (fileName, mismatches) ->
-                    val missingHtml = buildMismatchGroupHtml(
-                        directoryPath = path,
-                        label = NgxTranslateIntellisenseBundle.message("translationKeyWarningsMissing"),
-                        mismatches = mismatches.filter { it.type == TranslationKeyMismatchType.MISSING }
-                    )
-                    val extraHtml = buildMismatchGroupHtml(
-                        directoryPath = path,
-                        label = NgxTranslateIntellisenseBundle.message("translationKeyWarningsExtra"),
-                        mismatches = mismatches.filter { it.type == TranslationKeyMismatchType.EXTRA }
-                    )
-
-                    """
-                    <li style='margin-bottom:6px;'>
-                      <b>${StringUtil.escapeXmlEntities(fileName)}</b>
-                      $missingHtml
-                      $extraHtml
-                    </li>
-                    """.trimIndent()
-                }
-
-            """
-            <div style='margin-bottom:8px;'>
-              <div><b>${StringUtil.escapeXmlEntities(NgxTranslateIntellisenseBundle.message("translationKeyWarningsFolder", path))}</b></div>
-              <ul style='margin-top:4px;'>$fileLines</ul>
-            </div>
-            """.trimIndent()
-        }
-
-        if (folderBlocks.isEmpty()) return ""
-        return "<html><body>${folderBlocks.joinToString("")}</body></html>"
-    }
-
-    private fun buildMismatchGroupHtml(
-        directoryPath: String,
-        label: String,
-        mismatches: List<TranslationKeyMismatch>
-    ): String {
-        if (mismatches.isEmpty()) return ""
-
-        val previewLinks = mismatches
-            .take(KEY_PREVIEW_LIMIT)
-            .joinToString(", ") {
-                buildWarningKeyLink(directoryPath, it.navigationFileName, it.key)
-            }
-        val more = if (mismatches.size > KEY_PREVIEW_LIMIT) {
-            StringUtil.escapeXmlEntities(
-                NgxTranslateIntellisenseBundle.message(
-                    "translationKeyWarningsMore",
-                    mismatches.size - KEY_PREVIEW_LIMIT
-                )
-            )
-        } else {
-            ""
-        }
-
-        return "<div style='margin:2px 0 0 14px;'><b>${StringUtil.escapeXmlEntities(label)}</b> $previewLinks$more</div>"
-    }
-
-    private fun buildWarningKeyLink(directoryPath: String, fileName: String, key: String): String {
-        val href = buildString {
-            append(WARNING_LINK_SCHEME)
-            append("?dir=")
-            append(URLEncoder.encode(directoryPath, StandardCharsets.UTF_8))
-            append("&file=")
-            append(URLEncoder.encode(fileName, StandardCharsets.UTF_8))
-            append("&key=")
-            append(URLEncoder.encode(key, StandardCharsets.UTF_8))
-        }
-
-        return "<a href='$href'>${StringUtil.escapeXmlEntities(key)}</a>"
-    }
-
-    private fun navigateFromWarningLink(description: String?) {
-        if (description.isNullOrBlank() || !description.startsWith(WARNING_LINK_SCHEME)) return
-
-        val query = description.substringAfter('?', missingDelimiterValue = "")
-        val params = query
-            .split('&')
-            .mapNotNull { entry ->
-                val index = entry.indexOf('=')
-                if (index <= 0) return@mapNotNull null
-                val key = entry.substring(0, index)
-                val value = entry.substring(index + 1)
-                key to URLDecoder.decode(value, StandardCharsets.UTF_8)
-            }
-            .toMap()
-
-        val directoryPath = params["dir"] ?: return
-        val fileName = params["file"] ?: return
-        val key = params["key"] ?: return
-        val target = NgxTranslatePsiUtils.findBestNavigationElement(project, directoryPath, fileName, key) ?: return
-        val virtualFile = target.containingFile?.virtualFile ?: return
-        val offset = target.textRange?.startOffset ?: 0
-        OpenFileDescriptor(project, virtualFile, offset).navigate(true)
-    }
-
-    /**
-     * Creates a tree component showing translation directories and their JSON files.
-     * 
-     * @param project The IntelliJ project instance
-     * @param i18nPaths List of configured translation directory paths
-     * @return A configured Tree component with custom rendering and mouse listeners
-     */
-    private fun createTranslationDirectoriesTree(project: Project, i18nPaths: List<String>): Tree {
-        val root = DefaultMutableTreeNode("Translation Directories")
-        treeModel = DefaultTreeModel(root)
-
-        // Add each translation directory and its contents
-        i18nPaths.forEach { path ->
-            val dirNode = DefaultMutableTreeNode(DirectoryNode(path))
-            root.add(dirNode)
-
-            // Add files in the directory
-            val virtualFile = VirtualFileManager.getInstance().findFileByUrl("file://$path")
-            virtualFile?.children?.forEach { file ->
-                if (!file.isDirectory && file.extension == "json") {
-                    val fileNode = DefaultMutableTreeNode(FileNode(file.name, file.path))
-                    dirNode.add(fileNode)
-                }
-            }
-        }
-
-        val tree = Tree(treeModel)
-        tree.isRootVisible = true
-        tree.showsRootHandles = true
-
-        // Custom cell renderer for icons
-        tree.cellRenderer = object : DefaultTreeCellRenderer() {
-            override fun getTreeCellRendererComponent(
-                tree: JTree?,
-                value: Any?,
-                sel: Boolean,
-                expanded: Boolean,
-                leaf: Boolean,
-                row: Int,
-                hasFocus: Boolean
-            ): java.awt.Component {
-                super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus)
-
-                if (value is DefaultMutableTreeNode) {
-                    when (val userObject = value.userObject) {
-                        is DirectoryNode -> {
-                            icon = AllIcons.Nodes.Folder
-                            val segments = userObject.path.split("/").filter { it.isNotBlank() }
-                            text = segments.takeLast(3).joinToString("/")
-                            toolTipText = userObject.path
-                        }
-
-                        is FileNode -> {
-                            icon = AllIcons.FileTypes.Json
-                            text = userObject.name
-                        }
-
-                        else -> {
-                            icon = AllIcons.Nodes.ModuleGroup
-                        }
+    private fun subscribeToVfsChanges(configuredPaths: List<String>) {
+        project.messageBus.connect().subscribe(
+            VirtualFileManager.VFS_CHANGES,
+            object : BulkFileListener {
+                override fun after(events: MutableList<out VFileEvent>) {
+                    val hasChangedTranslationJson = events.any { event ->
+                        event.file?.extension == "json" &&
+                            configuredPaths.any { path -> event.file?.path?.startsWith(path) == true }
                     }
-                }
 
-                return this
-            }
-        }
-
-        // Expand all nodes by default
-        for (i in 0 until tree.rowCount) {
-            tree.expandRow(i)
-        }
-
-        // Add mouse listener to open files on click
-        tree.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent) {
-                if (e.clickCount == 1) { // Single-click
-                    val path = tree.getPathForLocation(e.x, e.y) ?: return
-                    val node = path.lastPathComponent as? DefaultMutableTreeNode ?: return
-
-                    when (val userObject = node.userObject) {
-                        is FileNode -> {
-                            // Open the file in the editor
-                            val virtualFile =
-                                VirtualFileManager.getInstance().findFileByUrl("file://${userObject.path}")
-                            virtualFile?.let {
-                                FileEditorManager.getInstance(project).openFile(it, true)
-                            }
-                        }
+                    if (hasChangedTranslationJson) {
+                        ApplicationManager.getApplication().invokeLater { refreshTree() }
                     }
                 }
             }
-        })
-
-        return tree
+        )
     }
-
-    /**
-     * Data class representing a directory node in the translation tree.
-     * 
-     * @param path The absolute file system path to the directory
-     */
-    private data class DirectoryNode(val path: String)
-    
-    /**
-     * Data class representing a file node in the translation tree.
-     * 
-     * @param name The display name of the file
-     * @param path The absolute file system path to the file
-     */
-    private data class FileNode(val name: String, val path: String)
 }
