@@ -6,11 +6,13 @@ import com.intellij.json.JsonFileType
 import com.intellij.json.JsonUtil
 import com.intellij.json.psi.JsonFile
 import com.intellij.json.psi.JsonObject
+import com.intellij.json.psi.JsonProperty
 import com.intellij.json.psi.JsonStringLiteral
 import com.intellij.json.psi.JsonValue
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import kotlin.io.path.Path
 
@@ -22,9 +24,20 @@ import kotlin.io.path.Path
  * It serves as the core engine for file content analysis throughout the plugin.
  */
 object NgxTranslatePsiUtils {
+    enum class TranslationKeyMismatchType {
+        MISSING,
+        EXTRA
+    }
+
+    data class TranslationKeyMismatch(
+        val key: String,
+        val type: TranslationKeyMismatchType,
+        val navigationFileName: String
+    )
+
     data class TranslationKeyConsistencyResult(
         val isValid: Boolean,
-        val mismatchDetails: Map<String, Set<String>> = emptyMap()
+        val mismatchDetails: Map<String, List<TranslationKeyMismatch>> = emptyMap()
     )
 
     /**
@@ -140,13 +153,111 @@ object NgxTranslatePsiUtils {
         if (union == intersection) return TranslationKeyConsistencyResult(isValid = true)
 
         val mismatchDetails = keysByFile
-            .mapValues { (_, keys) -> (union - keys) + (keys - intersection) }
+            .mapValues { (fileName, keys) ->
+                buildList {
+                    (union - keys)
+                        .sorted()
+                        .forEach { key ->
+                            val referenceFileName = keysByFile.entries
+                                .firstOrNull { (_, candidateKeys) -> key in candidateKeys }
+                                ?.key
+                                ?: fileName
+
+                            add(
+                                TranslationKeyMismatch(
+                                    key = key,
+                                    type = TranslationKeyMismatchType.MISSING,
+                                    navigationFileName = referenceFileName
+                                )
+                            )
+                        }
+
+                    (keys - intersection)
+                        .sorted()
+                        .forEach { key ->
+                            add(
+                                TranslationKeyMismatch(
+                                    key = key,
+                                    type = TranslationKeyMismatchType.EXTRA,
+                                    navigationFileName = fileName
+                                )
+                            )
+                        }
+                }
+            }
             .filterValues { it.isNotEmpty() }
 
         return TranslationKeyConsistencyResult(
             isValid = false,
             mismatchDetails = mismatchDetails
         )
+    }
+
+    fun findTranslationJsonFile(project: Project, directoryPath: String, fileName: String): JsonFile? {
+        val virtualFile = getTranslationJsonFilesFromDirPath(directoryPath)
+            .firstOrNull { it.name == fileName }
+            ?: return null
+
+        return PsiManager.getInstance(project).findFile(virtualFile) as? JsonFile
+    }
+
+    fun findJsonPropertyByFullKey(jsonFile: JsonFile, fullKey: String): JsonProperty? {
+        val pathSegments = fullKey.split('.').filter { it.isNotBlank() }
+        if (pathSegments.isEmpty()) return null
+
+        var currentObject = JsonUtil.getTopLevelObject(jsonFile) ?: return null
+        var currentProperty: JsonProperty? = null
+
+        for ((index, segment) in pathSegments.withIndex()) {
+            currentProperty = currentObject.findProperty(segment) ?: return null
+            if (index == pathSegments.lastIndex) return currentProperty
+
+            currentObject = currentProperty.value as? JsonObject ?: return null
+        }
+
+        return currentProperty
+    }
+
+    fun computeFullKey(property: JsonProperty): String {
+        val segments = mutableListOf(property.name)
+        var parentObject = property.parent as? JsonObject
+
+        while (true) {
+            val parentProperty = parentObject?.parent as? JsonProperty ?: break
+            segments.add(parentProperty.name)
+            parentObject = parentProperty.parent as? JsonObject
+        }
+
+        return segments.asReversed().joinToString(".")
+    }
+
+    fun findNearestJsonPropertyByFullKey(jsonFile: JsonFile, fullKey: String): JsonProperty? {
+        val pathSegments = fullKey.split('.').filter { it.isNotBlank() }
+        if (pathSegments.isEmpty()) return null
+
+        var currentObject = JsonUtil.getTopLevelObject(jsonFile) ?: return null
+        var currentProperty: JsonProperty? = null
+
+        for ((index, segment) in pathSegments.withIndex()) {
+            currentProperty = currentObject.findProperty(segment) ?: break
+            if (index == pathSegments.lastIndex) break
+
+            currentObject = currentProperty.value as? JsonObject ?: break
+        }
+
+        return currentProperty
+    }
+
+    fun findBestNavigationElement(
+        project: Project,
+        directoryPath: String,
+        fileName: String,
+        fullKey: String
+    ): PsiElement? {
+        val jsonFile = findTranslationJsonFile(project, directoryPath, fileName) ?: return null
+        return findJsonPropertyByFullKey(jsonFile, fullKey)?.nameElement
+            ?: findNearestJsonPropertyByFullKey(jsonFile, fullKey)?.nameElement
+            ?: jsonFile
     }
 
     /**
