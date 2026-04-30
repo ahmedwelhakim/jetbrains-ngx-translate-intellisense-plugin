@@ -111,6 +111,8 @@ Configure the plugin settings via **File** → **Settings** → **Tools** → **
 - **Inlay Hints**: Toggle inline translation display and set maximum text length
 - **File Patterns**: Customize file naming conventions for translation files
 
+The tool window shows warnings when locale JSON files in the same folder have mismatched key sets.
+
 ## Requirements
 
 - IntelliJ IDEA Ultimate 2024.3 or later

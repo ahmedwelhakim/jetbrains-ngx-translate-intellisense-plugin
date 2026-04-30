@@ -1,5 +1,7 @@
 package com.github.ahmedwelhakim.ngxtranslateintellisense.ui
 
+import com.github.ahmedwelhakim.ngxtranslateintellisense.NgxTranslateIntellisenseBundle
+import com.github.ahmedwelhakim.ngxtranslateintellisense.psi.NgxTranslatePsiUtils
 import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateConfigurationStateService
 import com.github.ahmedwelhakim.ngxtranslateintellisense.settings.NgxTranslateSettingsConfigurable
 import com.intellij.icons.AllIcons
@@ -7,16 +9,21 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import javax.swing.BorderFactory
 import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JEditorPane
 import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
@@ -37,6 +44,8 @@ class NgxTranslateToolWindow() {
     private lateinit var tree: Tree
     private lateinit var treeModel: DefaultTreeModel
     private lateinit var project: Project
+    private lateinit var warningPanel: JPanel
+    private lateinit var warningArea: JEditorPane
 
     /**
      * Creates and returns the main content panel for the tool window.
@@ -55,6 +64,30 @@ class NgxTranslateToolWindow() {
         // Create tree for translation directories
         tree = createTranslationDirectoriesTree(project, state.i18nPaths)
         val treeScrollPane = JBScrollPane(tree)
+        warningArea = JEditorPane("text/html", "").apply {
+            isEditable = false
+            isOpaque = false
+            putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true)
+        }
+        val warningScrollPane = JBScrollPane(warningArea).apply {
+
+            border = BorderFactory.createEmptyBorder(15,15,15,15)
+            preferredSize = Dimension(0, 110)
+            horizontalScrollBarPolicy = JBScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        }
+        warningPanel = JPanel(BorderLayout(0, 4)).apply {
+            border = BorderFactory.createEmptyBorder(5,5,5,5)
+            add(
+                JLabel(
+                    NgxTranslateIntellisenseBundle.message("translationKeyWarningsTitle"),
+                    AllIcons.General.Warning,
+                    JLabel.LEFT
+                ),
+                BorderLayout.PAGE_START
+            )
+            add(warningScrollPane, BorderLayout.CENTER)
+        }
+        refreshWarnings(state.i18nPaths)
 
         // Listen for file system changes to auto-refresh
         project.messageBus.connect().subscribe(
@@ -78,7 +111,7 @@ class NgxTranslateToolWindow() {
         // Create settings button
         val settingsButton = JButton("Settings", AllIcons.General.Settings).apply {
             addActionListener {
-                val result = ShowSettingsUtil.getInstance()
+                ShowSettingsUtil.getInstance()
                     .showSettingsDialog(project, NgxTranslateSettingsConfigurable::class.java)
                 // Refresh tree after settings dialog closes
                 ApplicationManager.getApplication().invokeLater {
@@ -101,7 +134,8 @@ class NgxTranslateToolWindow() {
         }
 
         return JPanel(BorderLayout(10, 5)).apply {
-            add(treeScrollPane, BorderLayout.CENTER)
+            add(treeScrollPane, BorderLayout.PAGE_START)
+            add(warningPanel, BorderLayout.CENTER)
             add(bottomPanel, BorderLayout.PAGE_END)
         }
     }
@@ -135,11 +169,49 @@ class NgxTranslateToolWindow() {
 
         treeModel.setRoot(root)
         treeModel.reload()
+        refreshWarnings(state.i18nPaths)
 
         // Expand all nodes
         for (i in 0 until tree.rowCount) {
             tree.expandRow(i)
         }
+    }
+
+    private fun refreshWarnings(paths: List<String>) {
+        val warningHtml = buildMismatchWarningHtml(paths)
+        warningPanel.isVisible = warningHtml.isNotBlank()
+        warningArea.text = warningHtml.ifBlank {
+            "<html><body>${StringUtil.escapeXmlEntities(NgxTranslateIntellisenseBundle.message("translationKeyWarningsNone"))}</body></html>"
+        }
+        warningArea.caretPosition = 0
+    }
+
+    private fun buildMismatchWarningHtml(paths: List<String>): String {
+        val folderBlocks = paths.mapNotNull { path ->
+            val consistency = NgxTranslatePsiUtils.validateTranslationKeysConsistency(project, path)
+            if (consistency.isValid) return@mapNotNull null
+
+            val fileLines = consistency.mismatchDetails.entries
+                .sortedBy { it.key }
+                .joinToString("") { (fileName, keys) ->
+                    val previewLimit = 4
+                    val preview = keys.sorted().take(previewLimit).joinToString(", ")
+                    val more = if (keys.size > previewLimit) {
+                        NgxTranslateIntellisenseBundle.message("translationKeyWarningsMore", keys.size - previewLimit)
+                    } else ""
+                    "<li><b>${StringUtil.escapeXmlEntities(fileName)}</b>: ${StringUtil.escapeXmlEntities(preview + more)}</li>"
+                }
+
+            """
+            <div style='margin-bottom:8px;'>
+              <div><b>${StringUtil.escapeXmlEntities(NgxTranslateIntellisenseBundle.message("translationKeyWarningsFolder", path))}</b></div>
+              <ul style='margin-top:4px;'>$fileLines</ul>
+            </div>
+            """.trimIndent()
+        }
+
+        if (folderBlocks.isEmpty()) return ""
+        return "<html><body>${folderBlocks.joinToString("")}</body></html>"
     }
 
     /**

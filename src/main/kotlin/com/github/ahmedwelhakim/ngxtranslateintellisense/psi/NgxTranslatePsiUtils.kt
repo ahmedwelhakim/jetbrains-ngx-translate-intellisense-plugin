@@ -1,5 +1,6 @@
 package com.github.ahmedwelhakim.ngxtranslateintellisense.psi
 
+import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateUtils
 import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateConfigurationStateService
 import com.intellij.json.JsonFileType
 import com.intellij.json.JsonUtil
@@ -21,6 +22,11 @@ import kotlin.io.path.Path
  * It serves as the core engine for file content analysis throughout the plugin.
  */
 object NgxTranslatePsiUtils {
+    data class TranslationKeyConsistencyResult(
+        val isValid: Boolean,
+        val mismatchDetails: Map<String, Set<String>> = emptyMap()
+    )
+
     /**
      * Retrieves JSON string literal elements for the specified translation keys.
      * 
@@ -107,6 +113,40 @@ object NgxTranslatePsiUtils {
             .getInstance(project).state.i18nPaths
             .map { getTranslationJsonFilesFromDirPath(it) }
             .flatten()
+    }
+
+    /**
+     * Validates that all locale JSON files in a directory share the same flattened key set.
+     */
+    fun validateTranslationKeysConsistency(project: Project, path: String): TranslationKeyConsistencyResult {
+        val jsonAssets = getTranslationJsonFilesFromDirPath(path)
+            .filter(NgxTranslateUtils::isTranslationFile)
+
+        if (jsonAssets.size <= 1) return TranslationKeyConsistencyResult(isValid = true)
+
+        val psiManager = PsiManager.getInstance(project)
+        val keysByFile = jsonAssets
+            .sortedBy { it.name }
+            .associate { file ->
+                val keys = (psiManager.findFile(file) as? JsonFile)
+                    ?.let(::extractJsonKeys)
+                    ?.toSet()
+                    ?: emptySet()
+                file.name to keys
+            }
+
+        val union = keysByFile.values.fold(emptySet<String>()) { acc, keys -> acc + keys }
+        val intersection = keysByFile.values.reduceOrNull { acc, keys -> acc intersect keys } ?: emptySet()
+        if (union == intersection) return TranslationKeyConsistencyResult(isValid = true)
+
+        val mismatchDetails = keysByFile
+            .mapValues { (_, keys) -> (union - keys) + (keys - intersection) }
+            .filterValues { it.isNotEmpty() }
+
+        return TranslationKeyConsistencyResult(
+            isValid = false,
+            mismatchDetails = mismatchDetails
+        )
     }
 
     /**

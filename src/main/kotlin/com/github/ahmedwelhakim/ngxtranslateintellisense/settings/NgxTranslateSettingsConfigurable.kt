@@ -6,6 +6,7 @@ import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateCo
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBLabel
@@ -67,25 +68,22 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                     ) {
                         pathsModel.addElement(path)
                     } else if (path.isBlank()) {
-                        JOptionPane.showMessageDialog(
-                            null,
+                        Messages.showErrorDialog(
+                            project,
                             NgxTranslateIntellisenseBundle.message("addI18nFolderPleaseChooseFolderError"),
-                            NgxTranslateIntellisenseBundle.message("addI18nFolder"),
-                            JOptionPane.ERROR_MESSAGE
+                            NgxTranslateIntellisenseBundle.message("addI18nFolder")
                         )
                     } else if (!NgxTranslateUtils.isTranslationDirectoryNotEmpty(path)) {
-                        JOptionPane.showMessageDialog(
-                            null,
+                        Messages.showErrorDialog(
+                            project,
                             NgxTranslateIntellisenseBundle.message("addI18nFolderError"),
-                            NgxTranslateIntellisenseBundle.message("addI18nFolder"),
-                            JOptionPane.ERROR_MESSAGE
+                            NgxTranslateIntellisenseBundle.message("addI18nFolder")
                         )
                     } else if (pathsModel.contains(path)) {
-                        JOptionPane.showMessageDialog(
-                            null,
+                        Messages.showErrorDialog(
+                            project,
                             NgxTranslateIntellisenseBundle.message("addI18nFolderDuplicateError"),
-                            NgxTranslateIntellisenseBundle.message("addI18nFolder"),
-                            JOptionPane.ERROR_MESSAGE
+                            NgxTranslateIntellisenseBundle.message("addI18nFolder")
                         )
                     }
                 }
