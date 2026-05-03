@@ -102,7 +102,7 @@ internal class NgxTranslateWarningSupport(private val project: Project) {
 
         val previewLinks = mismatches
             .take(KEY_PREVIEW_LIMIT)
-            .joinToString(", ") {
+            .joinToString("") {
                 buildWarningKeyLink(
                     directoryPath,
                     it.navigationFileName,
@@ -136,9 +136,9 @@ internal class NgxTranslateWarningSupport(private val project: Project) {
         }
 
         return if (isExtra)
-            "<a href='$href'>${StringUtil.escapeXmlEntities(key)}</a>"
+            "<div> <a href='$href'>${StringUtil.escapeXmlEntities(key)}</a> </div>"
         else
-            "<span> ${StringUtil.escapeXmlEntities(key)} </span>"
+            "<div> ${StringUtil.escapeXmlEntities(key)} </div>"
     }
 }
 

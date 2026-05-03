@@ -7,6 +7,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Splitter
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
@@ -15,11 +16,7 @@ import com.intellij.ui.treeStructure.Tree
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
-import javax.swing.BorderFactory
-import javax.swing.JButton
-import javax.swing.JLabel
-import javax.swing.JEditorPane
-import javax.swing.JPanel
+import javax.swing.*
 import javax.swing.event.HyperlinkEvent
 import javax.swing.tree.DefaultTreeModel
 
@@ -57,9 +54,12 @@ class NgxTranslateToolWindow {
         refreshWarnings(state.i18nPaths)
         subscribeToVfsChanges(state.i18nPaths)
 
-        return JPanel(BorderLayout(10, 5)).apply {
-            add(JBScrollPane(tree), BorderLayout.PAGE_START)
-            add(warningPanel, BorderLayout.CENTER)
+        return JPanel(BorderLayout(0, 0)).apply {
+            add(Splitter(true, 0.5f).apply {
+
+                firstComponent = JBScrollPane(tree)
+                secondComponent = warningPanel
+            }, BorderLayout.CENTER)
             add(createBottomPanel(), BorderLayout.PAGE_END)
         }
     }
@@ -146,7 +146,7 @@ class NgxTranslateToolWindow {
                 override fun after(events: MutableList<out VFileEvent>) {
                     val hasChangedTranslationJson = events.any { event ->
                         event.file?.extension == "json" &&
-                            configuredPaths.any { path -> event.file?.path?.startsWith(path) == true }
+                                configuredPaths.any { path -> event.file?.path?.startsWith(path) == true }
                     }
 
                     if (hasChangedTranslationJson) {
