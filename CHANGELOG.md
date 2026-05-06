@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+- Add Unused Translation keys Warning annotator
+- Add Duplicate Translation Value Warning annotator
+- Add options in settings to enable/disable the above annotators
+
+## [2.0.1]
+
+- Enhance UI
+
+## [2.0.0]
+
 - Add Missing Translation Keys Detection in Tool Window
 - Add Error Annotator on extra fields in translation files
 
@@ -31,7 +41,7 @@
 - Reference navigation for translation keys
 - Support for multiple translation directories
 
-[Unreleased]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.0.1...HEAD
 
 [0.0.1]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/commits/v0.0.1
 
