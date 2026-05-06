@@ -110,7 +110,7 @@ class NgxTranslateToolWindow {
             add(
                 JLabel(
                     NgxTranslateIntellisenseBundle.message("translationKeyWarningsTitle"),
-                    AllIcons.General.Warning,
+                    AllIcons.General.Error,
                     JLabel.LEFT
                 ),
                 BorderLayout.PAGE_START

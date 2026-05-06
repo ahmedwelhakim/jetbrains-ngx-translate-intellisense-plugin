@@ -20,6 +20,9 @@ class NgxTranslateExtraKeyAnnotator : Annotator {
         val project = property.project
         if (!NgxTranslateUtils.isSupportedProject(project)) return
 
+        // Check if error annotator is enabled
+        if (!NgxTranslateConfigurationStateService.getInstance(project).state.errorAnnotatorEnabled) return
+
         val file = property.containingFile.virtualFile ?: return
         if (!NgxTranslateUtils.isTranslationFile(file)) return
 
