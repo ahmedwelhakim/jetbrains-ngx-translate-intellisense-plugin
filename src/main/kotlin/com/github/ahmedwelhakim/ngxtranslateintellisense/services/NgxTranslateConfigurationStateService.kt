@@ -46,6 +46,9 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         var foldKeyEnabled by property(true)
         var autoDiscoveryEnabled by property(true)
         var addToSmartCompletion by property(true)
+        var errorAnnotatorEnabled by property(true)
+        var warningUnusedAnnotatorEnabled by property(true)
+        var warningDuplicateValuesAnnotatorEnabled by property(true)
     }
 
     init {
@@ -81,7 +84,10 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         inlayHintEnabled: Boolean,
         foldKeyEnabled: Boolean,
         autoDiscoveryEnabled: Boolean,
-        useSmartCompletion: Boolean = false
+        useSmartCompletion: Boolean = false,
+        errorAnnotatorEnabled: Boolean = true,
+        warningUnusedAnnotatorEnabled: Boolean = true,
+        warningDuplicateValuesAnnotatorEnabled: Boolean = true
     ) {
         state.lang = NgxTranslateUtils.toSystemIndependent(lang)
         state.i18nPaths = NgxTranslateUtils.toSystemIndependent(paths)
@@ -90,6 +96,9 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         state.foldKeyEnabled = foldKeyEnabled
         state.autoDiscoveryEnabled = autoDiscoveryEnabled
         state.addToSmartCompletion = useSmartCompletion
+        state.errorAnnotatorEnabled = errorAnnotatorEnabled
+        state.warningUnusedAnnotatorEnabled = warningUnusedAnnotatorEnabled
+        state.warningDuplicateValuesAnnotatorEnabled = warningDuplicateValuesAnnotatorEnabled
 
         DaemonCodeAnalyzer.getInstance(project).restart()
         ApplicationManager.getApplication().invokeLater {
