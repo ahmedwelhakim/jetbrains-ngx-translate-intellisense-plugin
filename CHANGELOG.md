@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-05-06
+
 - Add Unused Translation keys Warning annotator
 - Add Duplicate Translation Value Warning annotator
 - Add options in settings to enable/disable the above annotators
@@ -41,15 +43,10 @@
 - Reference navigation for translation keys
 - Support for multiple translation directories
 
-[Unreleased]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.0.1...HEAD
-
+[Unreleased]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.0.1...v2.1.0
+[2.0.1]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v1.2.0...v2.0.0
+[1.2.0]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v0.0.2...v1.2.0
+[0.0.2]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/commits/v0.0.1
-
-[0.0.2]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/commits/v0.0.2
-
-[1.2.0]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/commits/v1.2.0
-
-[2.0.0]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/commits/v2.0.0
-
-[2.0.1]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/commits/v2.0.1
-
