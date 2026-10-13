@@ -87,7 +87,12 @@ object NgxTranslatePsiUtils {
         val jsonAssets = getTranslationJsonFilesFromProject(project)
         val psiManager = PsiManager.getInstance(project)
         val config = NgxTranslateConfigurationStateService.getInstance(project).state
-        jsonAssets.filter { if (config.lang != null) it.name.contains(config.lang.toString()) else true }.forEach {
+        jsonAssets.filter { file ->
+            val locale = NgxTranslateUtils.translationFileParts(file.name)?.second ?: return@filter false
+            val language = config.lang
+            language == null || locale.equals(language, ignoreCase = true) ||
+                locale.startsWith("$language-", ignoreCase = true)
+        }.forEach {
             val psiFile = psiManager.findFile(it) as? JsonFile ?: return@forEach
             extractJsonKeyValue(psiFile, map)
         }
@@ -133,10 +138,6 @@ object NgxTranslatePsiUtils {
      */
     fun validateTranslationKeysConsistency(project: Project, path: String): TranslationKeyConsistencyResult {
         val jsonAssets = getTranslationJsonFilesFromDirPath(path)
-            .filter(NgxTranslateUtils::isTranslationFile)
-
-        if (jsonAssets.size <= 1) return TranslationKeyConsistencyResult(isValid = true)
-
         val psiManager = PsiManager.getInstance(project)
         val keysByFile = jsonAssets
             .sortedBy { it.name }
@@ -147,18 +148,28 @@ object NgxTranslatePsiUtils {
                     ?: emptySet()
                 file.name to keys
             }
+        return validateTranslationKeySets(keysByFile)
+    }
 
-        val union = keysByFile.values.fold(emptySet<String>()) { acc, keys -> acc + keys }
-        val intersection = keysByFile.values.reduceOrNull { acc, keys -> acc intersect keys } ?: emptySet()
-        if (union == intersection) return TranslationKeyConsistencyResult(isValid = true)
+    internal fun validateTranslationKeySets(keysByFile: Map<String, Set<String>>): TranslationKeyConsistencyResult {
+        val groups = keysByFile.entries.groupBy { NgxTranslateUtils.translationFileParts(it.key)?.first.orEmpty() }
+        val mismatchDetails = mutableMapOf<String, List<TranslationKeyMismatch>>()
 
-        val mismatchDetails = keysByFile
-            .mapValues { (fileName, keys) ->
+        for (files in groups.values) {
+            if (files.size <= 1) continue
+
+            val groupKeysByFile = files.associate { it.key to it.value }
+
+            val union = groupKeysByFile.values.fold(emptySet<String>()) { acc, keys -> acc + keys }
+            val intersection = groupKeysByFile.values.reduceOrNull { acc, keys -> acc intersect keys } ?: emptySet()
+            if (union == intersection) continue
+
+            mismatchDetails.putAll(groupKeysByFile.mapValues { (fileName, keys) ->
                 buildList {
                     (union - keys)
                         .sorted()
                         .forEach { key ->
-                            val referenceFileName = keysByFile.entries
+                            val referenceFileName = groupKeysByFile.entries
                                 .firstOrNull { (_, candidateKeys) -> key in candidateKeys }
                                 ?.key
                                 ?: fileName
@@ -185,10 +196,11 @@ object NgxTranslatePsiUtils {
                         }
                 }
             }
-            .filterValues { it.isNotEmpty() }
+                .filterValues { it.isNotEmpty() })
+        }
 
         return TranslationKeyConsistencyResult(
-            isValid = false,
+            isValid = mismatchDetails.isEmpty(),
             mismatchDetails = mismatchDetails
         )
     }
@@ -273,7 +285,7 @@ object NgxTranslatePsiUtils {
         }
             .getOrNull()
             ?.children
-            ?.filter { it.fileType == JsonFileType.INSTANCE }
+            ?.filter { it.fileType == JsonFileType.INSTANCE && NgxTranslateUtils.isTranslationFile(it) }
             ?: listOf()
     }
 

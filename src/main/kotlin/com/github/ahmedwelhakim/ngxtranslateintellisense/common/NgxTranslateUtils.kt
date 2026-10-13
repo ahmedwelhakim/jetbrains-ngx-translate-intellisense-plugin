@@ -22,7 +22,7 @@ object NgxTranslateUtils {
      * Checks if a given virtual file is a valid translation file.
      *
      * A file is considered a translation file if it has a .json extension
-     * and its name matches the locale pattern (e.g., "en.json", "fr-FR.json").
+     * and its name matches the locale pattern (e.g., "en.json", "settings.fr-FR.json").
      *
      * @param file The virtual file to check
      * @return true if the file is a valid translation file, false otherwise
@@ -31,18 +31,23 @@ object NgxTranslateUtils {
         return file.extension == "json" && NgxTranslateConstants.LOCALE_PATTERN.matches(file.name)
     }
 
+    /** Returns the section prefix and locale encoded in a translation file name. */
+    fun translationFileParts(fileName: String): Pair<String, String>? {
+        val match = NgxTranslateConstants.LOCALE_PATTERN.matchEntire(fileName) ?: return null
+        return match.groupValues[1] to match.groupValues[2]
+    }
+
     /**
      * Checks if a translation directory contains valid translation files.
      *
-     * The directory is considered non-empty if it contains at least one file
-     * and all files in the directory are valid translation files.
+     * The directory is considered non-empty if it contains a translation file.
      *
      * @param directoryPath The absolute path to the directory to check
      * @return true if the directory contains valid translation files, false otherwise
      */
     fun isTranslationDirectoryNotEmpty(directoryPath: String): Boolean {
         val dir = VirtualFileManager.getInstance().findFileByUrl("file://$directoryPath") ?: return false
-        return dir.children?.isNotEmpty() == true && dir.children.any { it.extension == "json" }
+        return dir.children?.any(::isTranslationFile) == true
     }
 
     /**
