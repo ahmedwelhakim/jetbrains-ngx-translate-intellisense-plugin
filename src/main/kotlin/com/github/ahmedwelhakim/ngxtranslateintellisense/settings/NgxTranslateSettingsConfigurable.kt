@@ -39,6 +39,9 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
     private val errorAnnotatorCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("enableErrorAnnotator"))
     private val warningAnnotatorCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("enableWarningAnnotator"))
     private val duplicateValuesAnnotatorCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("enableDuplicateValuesAnnotator"))
+    private val bypassSupportCheckCheckbox = JCheckBox(NgxTranslateIntellisenseBundle.message("bypassProjectSupportCheck")).apply {
+        toolTipText = NgxTranslateIntellisenseBundle.message("bypassProjectSupportCheckTooltip")
+    }
     private val pathsModel = DefaultListModel<String>()
     private val pathsList = JBList(pathsModel)
 
@@ -156,6 +159,12 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                 1,
                 false
             )
+            .addLabeledComponent(
+                JBLabel(NgxTranslateIntellisenseBundle.message("bypassProjectSupportCheckLabel")),
+                bypassSupportCheckCheckbox,
+                1,
+                false
+            )
             .addSeparator()
             .addComponent(JBLabel(NgxTranslateIntellisenseBundle.message("translationFoldersLabel")))
             .addComponent(listPanel)
@@ -186,6 +195,7 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
                 errorAnnotatorCheckbox.isSelected != state.errorAnnotatorEnabled ||
                 warningAnnotatorCheckbox.isSelected != state.warningUnusedAnnotatorEnabled ||
                 duplicateValuesAnnotatorCheckbox.isSelected != state.warningDuplicateValuesAnnotatorEnabled ||
+                bypassSupportCheckCheckbox.isSelected != state.bypassProjectSupportCheck ||
                 pathsModel.elements().toList() != state.i18nPaths
     }
 
@@ -206,7 +216,8 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
             addToSmartCompletionCheckbox.isSelected,
             errorAnnotatorCheckbox.isSelected,
             warningAnnotatorCheckbox.isSelected,
-            duplicateValuesAnnotatorCheckbox.isSelected
+            duplicateValuesAnnotatorCheckbox.isSelected,
+            bypassSupportCheckCheckbox.isSelected
         )
     }
 
@@ -227,6 +238,7 @@ class NgxTranslateSettingsConfigurable(private val project: Project) : Configura
         errorAnnotatorCheckbox.isSelected = state.errorAnnotatorEnabled
         warningAnnotatorCheckbox.isSelected = state.warningUnusedAnnotatorEnabled
         duplicateValuesAnnotatorCheckbox.isSelected = state.warningDuplicateValuesAnnotatorEnabled
+        bypassSupportCheckCheckbox.isSelected = state.bypassProjectSupportCheck
         inlayHintsCheckbox.isEnabled = !state.foldKeyEnabled
         pathsModel.clear()
         state.i18nPaths.forEach { pathsModel.addElement(it) }

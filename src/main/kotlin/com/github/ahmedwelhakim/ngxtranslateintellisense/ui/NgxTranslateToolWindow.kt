@@ -1,6 +1,7 @@
 package com.github.ahmedwelhakim.ngxtranslateintellisense.ui
 
 import com.github.ahmedwelhakim.ngxtranslateintellisense.NgxTranslateIntellisenseBundle
+import com.github.ahmedwelhakim.ngxtranslateintellisense.common.NgxTranslateUtils
 import com.github.ahmedwelhakim.ngxtranslateintellisense.services.NgxTranslateConfigurationStateService
 import com.github.ahmedwelhakim.ngxtranslateintellisense.settings.NgxTranslateSettingsConfigurable
 import com.intellij.icons.AllIcons
@@ -11,6 +12,7 @@ import com.intellij.openapi.ui.Splitter
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
+import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
 import java.awt.BorderLayout
@@ -30,6 +32,7 @@ class NgxTranslateToolWindow {
     private lateinit var warningPanel: JPanel
     private lateinit var warningArea: JEditorPane
     private lateinit var warningSupport: NgxTranslateWarningSupport
+    private val statusBannerHolder = JPanel(BorderLayout())
 
     /**
      * Creates and returns the main content panel for the tool window.
@@ -53,8 +56,10 @@ class NgxTranslateToolWindow {
         warningPanel = createWarningPanel(warningArea)
         refreshWarnings(state.i18nPaths)
         subscribeToVfsChanges(state.i18nPaths)
+        refreshStatusBanner()
 
         return JPanel(BorderLayout(0, 0)).apply {
+            add(statusBannerHolder, BorderLayout.PAGE_START)
             add(Splitter(true, 0.5f).apply {
 
                 firstComponent = JBScrollPane(tree)
@@ -76,6 +81,39 @@ class NgxTranslateToolWindow {
         treeModel.reload()
         NgxTranslateTreeUiConfigurer.expandAll(tree)
         refreshWarnings(state.i18nPaths)
+        refreshStatusBanner()
+    }
+
+    /**
+     * Shows a banner when the project isn't detected as Angular/Nx with ngx-translate:
+     * features are disabled unless the detection is bypassed in settings, in which case
+     * the banner warns that behavior is not guaranteed.
+     */
+    private fun refreshStatusBanner() {
+        statusBannerHolder.removeAll()
+        if (!NgxTranslateUtils.isDetectedAsSupportedProject(project)) {
+            val bypassed = NgxTranslateConfigurationStateService.getInstance(project).state.bypassProjectSupportCheck
+            val banner = if (bypassed) {
+                EditorNotificationPanel(EditorNotificationPanel.Status.Warning).apply {
+                    text = NgxTranslateIntellisenseBundle.message("projectNotSupportedBypassedBanner")
+                }
+            } else {
+                EditorNotificationPanel(EditorNotificationPanel.Status.Error).apply {
+                    text = NgxTranslateIntellisenseBundle.message("projectNotSupportedBanner")
+                    createActionLabel(NgxTranslateIntellisenseBundle.message("projectNotSupportedOpenSettings")) {
+                        openSettings()
+                    }
+                }
+            }
+            statusBannerHolder.add(banner, BorderLayout.CENTER)
+        }
+        statusBannerHolder.revalidate()
+        statusBannerHolder.repaint()
+    }
+
+    private fun openSettings() {
+        ShowSettingsUtil.getInstance().showSettingsDialog(project, NgxTranslateSettingsConfigurable::class.java)
+        ApplicationManager.getApplication().invokeLater { refreshTree() }
     }
 
     private fun refreshWarnings(paths: List<String>) {
@@ -121,10 +159,7 @@ class NgxTranslateToolWindow {
 
     private fun createBottomPanel(): JPanel {
         val settingsButton = JButton("Settings", AllIcons.General.Settings).apply {
-            addActionListener {
-                ShowSettingsUtil.getInstance().showSettingsDialog(project, NgxTranslateSettingsConfigurable::class.java)
-                ApplicationManager.getApplication().invokeLater { refreshTree() }
-            }
+            addActionListener { openSettings() }
         }
 
         val refreshButton = JButton("Refresh", AllIcons.General.Refresh).apply {

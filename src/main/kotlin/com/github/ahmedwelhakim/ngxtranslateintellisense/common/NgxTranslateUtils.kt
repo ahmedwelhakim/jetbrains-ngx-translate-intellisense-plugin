@@ -94,10 +94,22 @@ object NgxTranslateUtils {
      * 2. If it's an Angular project (has angular.json or @angular/core in package.json)
      * 3. If it's a Nx project (has nx.json or @nx/workspace in package.json)
      *
+     * The check is skipped when `bypassProjectSupportCheck` is enabled in the plugin settings.
+     *
      * @param project The IntelliJ project instance
-     * @return true if the project is Angular/Nx with ngx-translate, false otherwise
+     * @return true if the project is Angular/Nx with ngx-translate (or the check is bypassed), false otherwise
      */
-    fun isSupportedProject(project: Project): Boolean {
+    fun isSupportedProject(project: Project): Boolean =
+        NgxTranslateConfigurationStateService.getInstance(project).state.bypassProjectSupportCheck ||
+                isDetectedAsSupportedProject(project)
+
+    /**
+     * Detects whether the project is Angular/Nx with ngx-translate or Transloco, ignoring the bypass setting.
+     *
+     * @param project The IntelliJ project instance
+     * @return true if the project's root package.json matches, false otherwise
+     */
+    fun isDetectedAsSupportedProject(project: Project): Boolean {
         val projectBasePath = project.basePath ?: return false
 
         // Quick check: only look at root package.json
