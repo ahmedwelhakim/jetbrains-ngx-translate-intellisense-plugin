@@ -49,6 +49,7 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         var errorAnnotatorEnabled by property(true)
         var warningUnusedAnnotatorEnabled by property(true)
         var warningDuplicateValuesAnnotatorEnabled by property(true)
+        var bypassProjectSupportCheck by property(false)
     }
 
     init {
@@ -76,6 +77,7 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
      * @param inlayHintLength Maximum length for inlay hint text
      * @param inlayHintEnabled Whether inlay hints are enabled
      * @param autoDiscoveryEnabled Whether auto-discovery of paths is enabled
+     * @param bypassProjectSupportCheck Whether to enable the plugin regardless of project detection
      */
     fun saveSettings(
         lang: String,
@@ -87,7 +89,8 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         useSmartCompletion: Boolean = false,
         errorAnnotatorEnabled: Boolean = true,
         warningUnusedAnnotatorEnabled: Boolean = true,
-        warningDuplicateValuesAnnotatorEnabled: Boolean = true
+        warningDuplicateValuesAnnotatorEnabled: Boolean = true,
+        bypassProjectSupportCheck: Boolean = false
     ) {
         state.lang = NgxTranslateUtils.toSystemIndependent(lang)
         state.i18nPaths = NgxTranslateUtils.toSystemIndependent(paths)
@@ -99,6 +102,7 @@ class NgxTranslateConfigurationStateService(private val project: Project) :
         state.errorAnnotatorEnabled = errorAnnotatorEnabled
         state.warningUnusedAnnotatorEnabled = warningUnusedAnnotatorEnabled
         state.warningDuplicateValuesAnnotatorEnabled = warningDuplicateValuesAnnotatorEnabled
+        state.bypassProjectSupportCheck = bypassProjectSupportCheck
 
         DaemonCodeAnalyzer.getInstance(project).restart()
         ApplicationManager.getApplication().invokeLater {

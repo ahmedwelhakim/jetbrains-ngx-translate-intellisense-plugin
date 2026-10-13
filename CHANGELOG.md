@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+- Add setting to bypass Angular/ngx-translate project detection and always enable the plugin
+- Tool window is always visible and shows a notice when the project is not detected as supported
+
 ## [2.1.0] - 2026-05-06
 
 - Add Unused Translation keys Warning annotator
