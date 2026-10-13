@@ -17,6 +17,10 @@ version = providers.gradleProperty("pluginVersion").get()
 // Set the JVM language level used to build the project.
 kotlin {
     jvmToolchain(21)
+    compilerOptions {
+        // Don't emit DefaultImpls bridges for inherited platform interface methods (ToolWindowFactory etc.)
+        jvmDefault = org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode.NO_COMPATIBILITY
+    }
 }
 
 // Configure project's dependencies

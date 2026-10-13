@@ -27,6 +27,7 @@ import com.intellij.ui.SimpleColoredComponent
 import com.intellij.ui.SimpleTextAttributes
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBList
+import com.intellij.util.PsiNavigateUtil
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.Component
@@ -175,8 +176,7 @@ class NgxTranslateJsonKeyGotoDeclarationHandler : GotoDeclarationHandler {
             .setSouthComponent(south)
             .setItemChosenCallback(Runnable {
                 val selected = list.selectedValue ?: return@Runnable
-                (selected.target as? Navigatable)?.navigate(true)
-                    ?: (selected.target.navigationElement as? Navigatable)?.navigate(true)
+                PsiNavigateUtil.navigate(selected.target, true)
             })
             .createPopup()
 
