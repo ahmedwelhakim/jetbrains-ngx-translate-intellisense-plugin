@@ -30,8 +30,10 @@ object NgxTranslateConstants {
      * This pattern matches files with names like:
      * - "en.json" (language code only)
      * - "en-US.json" (language code with country code)
+     * - "settings.en.json" (section prefix and language code)
+     * - "settings.en-US.json" (section prefix and language/country code)
      *
      * The pattern is case-insensitive to handle various naming conventions.
      */
-    val LOCALE_PATTERN = Regex("^[a-z]{2}(-[A-Z]{2})?\\.json$", RegexOption.IGNORE_CASE)
+    val LOCALE_PATTERN = Regex("^(?:(.+)\\.)?([a-z]{2}(?:-[A-Z]{2})?)\\.json$", RegexOption.IGNORE_CASE)
 }
