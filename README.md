@@ -142,6 +142,10 @@ The plugin automatically detects translation files matching these patterns:
 
 - `en.json`, `fr.json`, `de.json` (language code only)
 - `en-US.json`, `fr-FR.json`, `de-DE.json` (language + country code)
+- `settings.en.json`, `settings.fr.json` (section prefix + language code)
+- `settings.en-US.json` (section prefix + language and country code)
+
+Files with the same section prefix are compared with each other for missing and extra keys.
 
 ## Contributing
 
