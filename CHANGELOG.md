@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-10-14
+
 - Add setting to bypass Angular/ngx-translate project detection and always enable the plugin
 - Tool window is always visible and shows a notice when the project is not detected as supported
 
@@ -46,7 +48,8 @@
 - Reference navigation for translation keys
 - Support for multiple translation directories
 
-[Unreleased]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/ahmedwelhakim/jetbrains-ngx-translate-intellisense-plugin/compare/v1.2.0...v2.0.0
